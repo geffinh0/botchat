@@ -2013,7 +2013,7 @@ function initBotModeratorModule() {
               body: JSON.stringify({ creatorUserId: info.userId, livestreamId: info.livestreamId })
             });
           } else {
-            showToast(`Perfil de "${info.name}" (ID: ${info.userId}) localizado, mas nenhuma live está ao vivo agora. Abra sua live no app e tente novamente!`, 'warning');
+            showToast(`Perfil de "${info.name}" (ID: ${info.sharedId || info.userId}) localizado com sucesso! A criadora está offline no momento (Modo Vigilante pronto).`, 'info', 4500);
           }
         } else {
           showToast(d.error || 'Nenhum perfil ou live encontrado com o identificador informado.', 'danger');

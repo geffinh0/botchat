@@ -150,28 +150,39 @@ class BotEngine {
   }
 
   // --- Requisições REST Auxiliares para o SuperLive ---
-  apiRequest(apiPath, body = {}) {
+  apiRequest(apiPath, body = {}, forceNoToken = false) {
     return new Promise((resolve, reject) => {
       const payload = JSON.stringify(body);
+      const headers = {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Accept': 'application/json',
+        'User-Agent': 'SuperLive/2.31.0 (samsung SM-G998B; Android 13; Scale/3.0)',
+        'Device-ID': this.config.deviceId,
+        'Content-Length': Buffer.byteLength(payload)
+      };
+
+      if (this.config.botToken && !this.authFailed && !forceNoToken) {
+        headers['Authorization'] = `Token ${this.config.botToken}`;
+      }
+
       const req = https.request({
         hostname: REMOTE_API_HOST,
         port: 443,
         path: `/api/v1/${apiPath}`,
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Accept': 'application/json',
-          'User-Agent': 'SuperLive/2.31.0 (samsung SM-G998B; Android 13; Scale/3.0)',
-          'Device-ID': this.config.deviceId,
-          'Authorization': `Token ${this.config.botToken}`,
-          'Content-Length': Buffer.byteLength(payload)
-        }
+        headers
       }, (res) => {
         let data = '';
         res.on('data', chunk => data += chunk);
         res.on('end', () => {
           try {
-            resolve(JSON.parse(data));
+            const json = JSON.parse(data);
+            if (json && json.error && (json.error.code === '2' || json.error.code === 2 || String(json.error.message).includes('logged out'))) {
+              this.authFailed = true;
+              console.warn(`[BOT API] Token expirado detectado na rota ${apiPath}. Retentando imediatamente em Modo Device-ID...`);
+              return this.apiRequest(apiPath, body, true).then(resolve).catch(reject);
+            }
+            resolve(json);
           } catch (e) {
             resolve({ raw: data, status: res.statusCode });
           }
@@ -675,6 +686,10 @@ class BotEngine {
 
     console.log(`[BOT DETECT] Checando identificador informado: "${raw}"...`);
 
+    let targetUser = null;
+    let targetLiveId = null;
+    let streamDetails = null;
+
     // 1. Tenta verificar diretamente como Livestream ID
     try {
       const liveRes = await this.apiRequest('livestream/retrieve', { livestream_id: raw });
@@ -682,75 +697,98 @@ class BotEngine {
         const sd = liveRes.stream_details;
         const u = liveRes.user || {};
         if (!sd.finished_at) {
-          console.log(`[BOT DETECT] Live #${raw} encontrada diretamente e está AO VIVO!`);
-          return {
-            userId: String(u.user_id || ''),
-            name: u.name || 'Criadora',
-            sharedId: u.shared_id || '',
-            avatar: u.profile_images && u.profile_images[0] ? u.profile_images[0].url : (u.profile_image ? u.profile_image.url : null),
-            isLive: true,
-            liveFound: true,
-            livestreamId: String(raw),
-            headline: sd.headline || 'Live ao Vivo',
-            viewers: sd.viewer_count || 0,
-            diamonds: sd.livestream_diamonds || 0,
-            is_modded: !!sd.is_modded
-          };
+          targetLiveId = String(raw);
+          streamDetails = sd;
+          targetUser = u;
         }
-      }
-    } catch (e) {
-      // Continua para busca por perfil
-    }
-
-    // 2. Tenta verificar como User ID via users/profile
-    try {
-      const profRes = await this.apiRequest('users/profile', { user_id: raw });
-      if (profRes && profRes.user) {
-        const u = profRes.user;
-        const liveId = u.livestream_id ? String(u.livestream_id) : null;
-        console.log(`[BOT DETECT] Perfil "${u.name}" (ID: ${u.user_id}) encontrado. Live ID: ${liveId}`);
-        return {
-          userId: String(u.user_id),
-          name: u.name || 'Criadora',
-          sharedId: u.shared_id || '',
-          avatar: u.profile_images && u.profile_images[0] ? u.profile_images[0].url : (u.profile_image ? u.profile_image.url : null),
-          isLive: !!liveId,
-          liveFound: !!liveId,
-          livestreamId: liveId,
-          headline: 'Live ao Vivo',
-          viewers: 0,
-          diamonds: 0,
-          is_modded: false
-        };
-      }
-    } catch (e) {
-      // Continua para busca
-    }
-
-    // 3. Tenta buscar via users/search
-    try {
-      const searchRes = await this.apiRequest('users/search', { search_query: raw });
-      if (searchRes && searchRes.items && searchRes.items.length > 0) {
-        const match = searchRes.items.find(it => String(it.shared_id) === raw || String(it.user_id) === raw) || searchRes.items[0];
-        const liveId = match.livestream_id ? String(match.livestream_id) : null;
-        console.log(`[BOT DETECT] Busca retornou "${match.name}" (ID: ${match.user_id}). Live ID: ${liveId}`);
-        return {
-          userId: String(match.user_id),
-          name: match.name || 'Criadora',
-          sharedId: match.shared_id || '',
-          avatar: match.profile_image ? match.profile_image.url : null,
-          isLive: !!liveId,
-          liveFound: !!liveId,
-          livestreamId: liveId,
-          headline: 'Live ao Vivo',
-          viewers: 0,
-          diamonds: 0,
-          is_modded: false
-        };
       }
     } catch (e) {}
 
-    throw new Error(`Nenhum perfil ou live encontrado com o identificador: "${raw}". Verifique se o ID está correto ou se a live já foi aberta.`);
+    // 2. Busca por users/search (compatível com shared_id "93319686", username "ju_suni", nome, ou ID)
+    if (!targetUser) {
+      try {
+        const searchRes = await this.apiRequest('users/search', { search_query: raw });
+        if (searchRes && searchRes.items && searchRes.items.length > 0) {
+          // Busca correspondência exata por shared_id, user_id ou username, ou utiliza o primeiro item retornado
+          const exact = searchRes.items.find(it => 
+            String(it.shared_id) === raw || 
+            String(it.user_id) === raw || 
+            (it.username && String(it.username).toLowerCase() === raw.toLowerCase())
+          ) || searchRes.items[0];
+
+          if (exact) {
+            targetUser = exact;
+            if (exact.livestream_id) {
+              targetLiveId = String(exact.livestream_id);
+            }
+          }
+        }
+      } catch (e) {
+        console.error('[BOT DETECT] Erro em users/search:', e.message);
+      }
+    }
+
+    // 3. Tenta users/profile diretamente caso o identificador seja o user_id interno
+    if (!targetUser) {
+      try {
+        const profRes = await this.apiRequest('users/profile', { user_id: raw });
+        if (profRes && profRes.user && !profRes.error) {
+          targetUser = profRes.user;
+          if (profRes.user.livestream_id) {
+            targetLiveId = String(profRes.user.livestream_id);
+          }
+        }
+      } catch (e) {}
+    }
+
+    // 4. Se encontrou o usuário, obtém dados completos do perfil via users/profile
+    if (targetUser) {
+      const internalId = String(targetUser.user_id);
+      try {
+        const fullProf = await this.apiRequest('users/profile', { user_id: internalId });
+        if (fullProf && fullProf.user && !fullProf.error) {
+          targetUser = { ...targetUser, ...fullProf.user };
+          if (fullProf.user.livestream_id) {
+            targetLiveId = String(fullProf.user.livestream_id);
+          }
+        }
+      } catch (e) {}
+
+      // Se há um livestream_id ativo, obtém stream_details atualizados
+      if (targetLiveId && !streamDetails) {
+        try {
+          const liveRes = await this.apiRequest('livestream/retrieve', { livestream_id: targetLiveId });
+          if (liveRes && liveRes.stream_details) {
+            streamDetails = liveRes.stream_details;
+          }
+        } catch (e) {}
+      }
+
+      const avatarUrl = (targetUser.profile_images && targetUser.profile_images[0] ? targetUser.profile_images[0].url : null)
+        || (targetUser.profile_image ? (targetUser.profile_image.url || targetUser.profile_image.thumbnail_url) : null);
+
+      const isLive = !!targetLiveId && (!streamDetails || !streamDetails.finished_at);
+
+      this.logSystem('SYSTEM', 'SUCCESS', `Perfil localizado: "${targetUser.name}" (ID: ${targetUser.user_id}, Shared: ${targetUser.shared_id || raw}). Ao vivo: ${isLive ? 'SIM (#' + targetLiveId + ')' : 'NÃO (Vigilante)'}`);
+
+      return {
+        userId: String(targetUser.user_id),
+        sharedId: String(targetUser.shared_id || raw),
+        name: targetUser.name || 'Criadora',
+        username: targetUser.username || '',
+        avatar: avatarUrl,
+        isLive: isLive,
+        liveFound: isLive,
+        livestreamId: isLive ? targetLiveId : null,
+        headline: streamDetails ? (streamDetails.headline || 'Live ao Vivo') : 'Live ao Vivo',
+        viewers: streamDetails ? (streamDetails.viewer_count || 0) : 0,
+        diamonds: targetUser.diamonds || (streamDetails ? streamDetails.livestream_diamonds : 0) || 0,
+        followers: targetUser.follower_count || 0,
+        is_modded: streamDetails ? !!streamDetails.is_modded : false
+      };
+    }
+
+    throw new Error(`Nenhum perfil ou live encontrado com o identificador: "${raw}". Verifique se o ID ou nome de usuário está correto.`);
   }
 
   async startMonitoring({ livestreamId, creatorUserId }) {
