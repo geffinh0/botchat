@@ -1,0 +1,36 @@
+{
+  "creatorUserId": "42910384",
+  "livestreamId": "151690318",
+  "autoDetectLive": true,
+  "moderationEnabled": false,
+  "muteWords": [
+    "palavrao",
+    "xingamento",
+    "ofensa",
+    "lixo",
+    "trouxa",
+    "golpe",
+    "fake",
+    "teste_mute"
+  ],
+  "banWords": [
+    "pedofilia",
+    "menor",
+    "crime",
+    "droga",
+    "estelionato",
+    "pix falso"
+  ],
+  "caseSensitive": false,
+  "exactMatch": false,
+  "recurringEnabled": false,
+  "recurringIntervalSeconds": 120,
+  "recurringMessages": [],
+  "recurringCurrentIndex": 0,
+  "dmEnabled": false,
+  "dmTemplate": "Live finalizada! Hoje você alcançou {viewers} espectadores e gerou {diamonds} diamantes na transmissão. Parabéns pelo show! ❤️",
+  "botToken": "1a5e3accb98f0827677f546a61c0bc36d7d89907",
+  "botUserId": "32037361",
+  "botName": "𝑨́𝒕𝒊𝒍𝒂",
+  "deviceId": "e7a42524b5241eb9a73f28bc11b4f2ed"
+}

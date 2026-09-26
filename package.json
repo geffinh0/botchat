@@ -1,0 +1,19 @@
+{
+  "name": "super-client-web",
+  "version": "2.31.0",
+  "description": "Super Client Web & PWA Dashboard com conexão real à API do SuperLive",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "superlive",
+    "superclient",
+    "dashboard",
+    "billing",
+    "ranking"
+  ],
+  "author": "Super Client Team",
+  "license": "MIT"
+}

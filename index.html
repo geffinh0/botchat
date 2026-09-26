@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Super Client — Robô Moderador de Live Automatizado para SuperLive com Fila de Mensagens e Resumo na DM.">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Super Client — Robô Moderador &amp; Assistente de Live</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="index.css?v=2.32.0">
+</head>
+<body>
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation (Exclusivo Robô Moderador) -->
+    <aside class="sidebar" id="appSidebar">
+      <div class="brand-section">
+        <div class="brand-logo" style="background: linear-gradient(135deg, #6366f1, #ec4899); box-shadow: 0 0 16px rgba(99,102,241,0.5);">🤖</div>
+        <div class="brand-info">
+          <h1>SUPER CLIENT</h1>
+          <span class="brand-badge" style="color:#a5b4fc; border-color:rgba(99,102,241,0.4);">Robô Moderador</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a class="nav-item active" href="#sectionBotOverview" id="navBotOverview">
+          <span class="nav-icon">🤖</span>
+          <span>Painel do Robô</span>
+          <span class="badge-tag live-badge" id="botNavStatusBadge" style="margin-left:auto; font-size:10px; padding:2px 6px;">OFF</span>
+        </a>
+        <a class="nav-item" href="#sectionBotRules" id="navBotRules">
+          <span class="nav-icon">🛡️</span>
+          <span>Regras de Palavras</span>
+        </a>
+        <a class="nav-item" href="#sectionBotQueue" id="navBotQueue">
+          <span class="nav-icon">🔁</span>
+          <span>Fila de Avisos</span>
+        </a>
+        <a class="nav-item" href="#sectionBotDm" id="navBotDm">
+          <span class="nav-icon">📬</span>
+          <span>Resumo pós-Live</span>
+        </a>
+        <a class="nav-item" href="#sectionBotConsoles" id="navBotConsoles">
+          <span class="nav-icon">💬</span>
+          <span>Chat &amp; Auditoria</span>
+        </a>
+        <a class="nav-item" href="#sectionBotSystemLogs" id="navBotSystemLogs">
+          <span class="nav-icon">📋</span>
+          <span>Logs &amp; Erros</span>
+          <span class="badge-tag" id="errorCounterBadge" style="margin-left:auto; font-size:10px; padding:2px 6px; display:none; background:#ef4444; color:#fff;">0</span>
+        </a>
+      </nav>
+
+      <!-- Botão para reabrir / focar no Preview Flutuante do Canto -->
+      <div style="padding: 12px 14px; margin-top: auto;">
+        <button class="btn btn-secondary" id="btnToggleCornerWidget" style="width: 100%; justify-content: center; gap: 8px; font-size: 12px; padding: 10px;">
+          <span>📺 Preview no Cantinho</span>
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="account-pill" id="sidebarAccountPill" title="Conta oficial do Robô Moderador" style="cursor:default;">
+          <div class="user-avatar" id="sidebarAvatar" style="background: linear-gradient(135deg, #6366f1, #a855f7);">
+            <span id="sidebarAvatarLetter">🤖</span>
+            <div class="online-indicator active" id="sidebarOnlineIndicator"></div>
+          </div>
+          <div class="account-details">
+            <div class="account-name" id="sidebarUsername">𝑨́𝒕𝒊𝒍𝒂 (Robô Oficial)</div>
+            <div class="account-meta" id="sidebarMeta">
+              <span>ID: <code style="color:#a5b4fc;">32037361</code></span>
+              <span class="badge-tag live-badge" style="font-size:9px; padding:1px 5px;">ATIVO</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-wrapper">
+      <!-- Top Sticky Header -->
+      <header class="top-header">
+        <div class="header-title-box">
+          <h2 id="pageTitle">Robô Moderador &amp; Assistente de Live</h2>
+          <p id="pageSubtitle">Moderação automatizada autorizada pela criadora, avisos cíclicos e estatísticas na DM</p>
+        </div>
+
+        <div class="header-actions">
+          <div class="badge-status disconnected" id="connectionModeBadge">
+            <span class="pulse-dot"></span>
+            <span id="connectionModeText">Robô Aguardando Live</span>
+          </div>
+          <button class="btn btn-secondary" id="btnBotSaveConfig" title="Salvar todas as regras e mensagens configuradas">
+            <span>💾 Salvar Regras</span>
+          </button>
+          <button class="btn btn-primary" id="btnBotToggleMonitoring" style="min-width: 170px;">
+            <span id="btnBotToggleIcon">▶</span> <span id="btnBotToggleText">Iniciar Moderação</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Body: Exclusivamente Robô Moderador -->
+      <div class="content-body">
+        <section class="tab-pane active" id="paneBot">
+
+          <!-- 1. Header & Live Connection Card -->
+          <div class="glass-card" id="sectionBotOverview" style="margin-bottom: 24px;">
+            <div class="bot-header-banner">
+              <div class="bot-account-info">
+                <div class="bot-avatar-container">
+                  <span class="bot-avatar-icon">🤖</span>
+                  <div class="online-indicator active" id="botOnlineIndicator"></div>
+                </div>
+                <div>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <h3 style="margin:0; font-size:18px; font-weight:800;">Conta Oficial do Robô: <span id="botAccountName" style="color:var(--accent);">𝑨́𝒕𝒊𝒍𝒂</span></h3>
+                    <span class="badge-tag" style="background:rgba(99,102,241,0.25); color:#a5b4fc; border:1px solid rgba(99,102,241,0.5); font-weight:700;">OFICIAL SUPER CLIENT</span>
+                  </div>
+                  <p style="margin:4px 0 0 0; font-size:13px; color:var(--text-secondary);">
+                    User ID: <code id="botAccountUserId" style="color:var(--text-primary); background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px;">32037361</code> | 
+                    Status WS: <span id="botWsStatusBadge" class="badge-tag live-badge" style="padding:2px 8px; font-size:11px;">CONECTADO</span> |
+                    Operação: <span id="botStatusText" style="font-weight:700; color:var(--text-primary);">Aguardando sua Live</span>
+                  </p>
+                </div>
+              </div>
+
+              <div class="bot-header-actions">
+                <span style="font-size:12px; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
+                  🔒 Operação legítima com permissão de moderador concedida
+                </span>
+              </div>
+            </div>
+
+            <!-- Creator Target & Live Connection Bar -->
+            <div class="bot-creator-bar">
+              <div class="bot-creator-input-group">
+                <label for="botCreatorUserId">ID ou Shared ID da sua Live / Criadora:</label>
+                <div style="display:flex; gap:8px;">
+                  <input type="text" id="botCreatorUserId" class="custom-input" placeholder="Digite seu ID ou Shared ID..." value="" style="width:260px;">
+                  <button class="btn btn-secondary" id="btnDetectLive" title="Verificar se a sua live está ativa no SuperLive">
+                    <span>🔍 Detectar Live Ativa</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="bot-live-status-card" id="botActiveLiveCard">
+                <div class="live-pill offline" id="botLiveBadgePill">
+                  <span class="pulse-dot"></span>
+                  <span id="botLiveBadgeText">NENHUMA LIVE DETECTADA</span>
+                </div>
+                <div class="live-info-preview" id="botLiveInfoPreview">
+                  Abra sua live no app e clique em <strong>Detectar Live Ativa</strong> para o robô conectar.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Bot Real-Time Stats Grid -->
+          <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 24px;">
+            <div class="glass-card">
+              <div class="card-header-flex">
+                <span class="card-label">Mensagens Analisadas</span>
+                <div class="card-icon-bubble primary">💬</div>
+              </div>
+              <div class="card-value" id="botStatAnalyzed">0</div>
+              <div class="card-trend">Filtro em tempo real no chat</div>
+            </div>
+
+            <div class="glass-card">
+              <div class="card-header-flex">
+                <span class="card-label">Silenciamentos (Mute)</span>
+                <div class="card-icon-bubble warning">🔇</div>
+              </div>
+              <div class="card-value" id="botStatMutes" style="color:var(--warning);">0</div>
+              <div class="card-trend">Usuários silenciados por regras</div>
+            </div>
+
+            <div class="glass-card">
+              <div class="card-header-flex">
+                <span class="card-label">Banimentos (Kick)</span>
+                <div class="card-icon-bubble danger">🚫</div>
+              </div>
+              <div class="card-value" id="botStatBans" style="color:var(--danger);">0</div>
+              <div class="card-trend">Usuários expulsos da sala</div>
+            </div>
+
+            <div class="glass-card">
+              <div class="card-header-flex">
+                <span class="card-label">Avisos Recorrentes</span>
+                <div class="card-icon-bubble success">📢</div>
+              </div>
+              <div class="card-value" id="botStatAnnouncements" style="color:var(--success);">0</div>
+              <div class="card-trend" id="botStatCountdownTrend">Próximo envio em: --</div>
+            </div>
+
+            <div class="glass-card">
+              <div class="card-header-flex">
+                <span class="card-label">DMs Pós-Live</span>
+                <div class="card-icon-bubble secondary">✉️</div>
+              </div>
+              <div class="card-value" id="botStatDms" style="color:var(--accent);">0</div>
+              <div class="card-trend">Resumos enviados com estatísticas</div>
+            </div>
+          </div>
+
+          <!-- 3. Rules & Automation Configurations (Grid 2 colunas) -->
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 24px; margin-bottom: 24px;">
+            
+            <!-- CARD 1: REGRAS DE MODERAÇÃO DE PALAVRAS -->
+            <div class="glass-card" id="sectionBotRules">
+              <div class="chart-header">
+                <div>
+                  <h3 style="font-size:16px; font-weight:800; display:flex; align-items:center; gap:8px;">
+                    🛡️ Regras de Moderação Automática
+                  </h3>
+                  <p style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+                    Defina os termos proibidos. O robô executará a ação legítima autorizada de moderador.
+                  </p>
+                </div>
+                <label class="switch-toggle" title="Ativar ou desativar filtragem de palavras">
+                  <input type="checkbox" id="botToggleModeration" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <!-- Palavras para Mute -->
+              <div class="rule-box" style="margin-top:16px;">
+                <div class="rule-header">
+                  <span class="rule-title" style="color:var(--warning);">🔇 Palavras para Silenciar (Mute)</span>
+                  <span class="rule-badge" id="muteWordsCount">0 palavras</span>
+                </div>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">
+                  Quando identificadas no chat, o usuário autor é silenciado na transmissão.
+                </p>
+                <div class="tags-container" id="muteWordsTags">
+                  <!-- Tags geradas dinamicamente -->
+                </div>
+                <div class="tag-input-row">
+                  <input type="text" id="inputNewMuteWord" class="custom-input" placeholder="Nova palavra para silenciar..." style="font-size:13px;">
+                  <button class="btn btn-secondary" id="btnAddMuteWord" style="padding:6px 14px; font-size:13px;">+ Adicionar</button>
+                </div>
+              </div>
+
+              <!-- Palavras para Ban -->
+              <div class="rule-box" style="margin-top:16px;">
+                <div class="rule-header">
+                  <span class="rule-title" style="color:var(--danger);">🚫 Palavras para Banir da Live (Kick)</span>
+                  <span class="rule-badge" id="banWordsCount">0 palavras</span>
+                </div>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">
+                  Violações graves: o usuário é imediatamente banido/expulso da sala de transmissão.
+                </p>
+                <div class="tags-container" id="banWordsTags">
+                  <!-- Tags geradas dinamicamente -->
+                </div>
+                <div class="tag-input-row">
+                  <input type="text" id="inputNewBanWord" class="custom-input" placeholder="Nova palavra para banir..." style="font-size:13px;">
+                  <button class="btn btn-secondary" id="btnAddBanWord" style="padding:6px 14px; font-size:13px;">+ Adicionar</button>
+                </div>
+              </div>
+
+              <!-- Opções extras de matching -->
+              <div style="display:flex; gap:20px; margin-top:16px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:13px; color:var(--text-secondary);">
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="botCaseSensitive"> Diferenciar Maiúsculas/Minúsculas
+                </label>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="botExactMatch"> Apenas Correspondência Exata
+                </label>
+              </div>
+            </div>
+
+            <!-- CARD 2: FILA DE MENSAGENS RECORRENTES DURANTE A LIVE -->
+            <div class="glass-card" id="sectionBotQueue">
+              <div class="chart-header">
+                <div>
+                  <h3 style="font-size:16px; font-weight:800; display:flex; align-items:center; gap:8px;">
+                    🔁 Fila de Mensagens Recorrentes
+                  </h3>
+                  <p style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+                    O robô envia mensagens ordenadas no chat em ciclo contínuo (01 → 02 → 03 → 01...).
+                  </p>
+                </div>
+                <label class="switch-toggle" title="Ativar ou desativar fila de avisos recorrentes">
+                  <input type="checkbox" id="botToggleRecurring" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <!-- Controles de Intervalo e Countdown -->
+              <div class="recurring-controls-bar">
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                  <label for="botRecurringInterval" style="font-size:13px; font-weight:600;">Intervalo de envio:</label>
+                  <select id="botRecurringInterval" class="custom-input" style="width:130px; padding:6px 10px; font-size:13px;">
+                    <option value="60">A cada 1 min</option>
+                    <option value="120" selected>A cada 2 min</option>
+                    <option value="180">A cada 3 min</option>
+                    <option value="300">A cada 5 min</option>
+                    <option value="600">A cada 10 min</option>
+                  </select>
+                </div>
+
+                <div style="display:flex; align-items:center; gap:12px; margin-left:auto; flex-wrap:wrap;">
+                  <div class="countdown-badge" id="botCountdownDisplay">
+                    ⏳ Próximo envio em: <span id="botCountdownTimerText" style="font-weight:800; color:var(--accent);">02:00</span>
+                  </div>
+                  <button class="btn btn-secondary" id="btnTestRecurringNow" style="padding:6px 14px; font-size:12px; white-space:nowrap;" title="Disparar a próxima mensagem da fila agora no chat da live">
+                    <span>▶️ Disparar Mensagem Agora (Teste)</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Lista da Fila de Mensagens -->
+              <div class="queue-list-container" id="botQueueList">
+                <!-- Itens da fila gerados via JS -->
+              </div>
+
+              <!-- Adicionar Nova Mensagem à Fila -->
+              <div style="margin-top:16px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06);">
+                <div style="font-size:13px; font-weight:600; margin-bottom:6px; color:var(--text-secondary);">Cadastrar nova mensagem para o ciclo:</div>
+                <div style="display:flex; gap:8px;">
+                  <input type="text" id="inputNewQueueMessage" class="custom-input" placeholder="Ex: Siga meu Instagram: @minha_conta!" style="font-size:13px;">
+                  <button class="btn btn-secondary" id="btnAddQueueMessage" style="padding:6px 14px; font-size:13px; white-space:nowrap;">+ Incluir na Fila</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 4. CARD 3: MENSAGEM AUTOMÁTICA PÓS-LIVE NA DM COM ESTATÍSTICAS -->
+          <div class="glass-card" id="sectionBotDm" style="margin-bottom: 24px;">
+            <div class="chart-header">
+              <div>
+                <h3 style="font-size:16px; font-weight:800; display:flex; align-items:center; gap:8px;">
+                  📬 Mensagem Automática pós-Live na DM
+                </h3>
+                <p style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+                  Quando a live encerra, o robô captura as estatísticas consolidadas e envia um relatório diretamente na sua DM.
+                </p>
+              </div>
+              <div style="display:flex; align-items:center; gap:16px;">
+                <label class="switch-toggle" title="Ativar ou desativar mensagem pós-live">
+                  <input type="checkbox" id="botToggleDm" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap:24px; margin-top:16px;">
+              <!-- Editor de Template -->
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <label for="botDmTemplate" style="font-size:13px; font-weight:600;">Modelo da Mensagem (Template Personalizável):</label>
+                  <span style="font-size:11px; color:var(--text-muted);">Clique nas tags para inserir no texto:</span>
+                </div>
+
+                <!-- Variáveis Dinâmicas Clicáveis -->
+                <div class="template-variable-tags" style="margin-bottom:10px;">
+                  <button class="var-tag-btn" data-var="{viewers}">👥 {viewers} (Espectadores)</button>
+                  <button class="var-tag-btn" data-var="{diamonds}">💎 {diamonds} (Diamantes)</button>
+                  <button class="var-tag-btn" data-var="{followers}">⭐ {followers} (Novos Seguidores)</button>
+                  <button class="var-tag-btn" data-var="{duration}">⏱️ {duration} (Duração)</button>
+                  <button class="var-tag-btn" data-var="{creator}">👤 {creator} (Seu Nome)</button>
+                </div>
+
+                <textarea id="botDmTemplate" class="custom-input" rows="4" style="width:100%; resize:vertical; font-size:13px; line-height:1.5;">Live finalizada! Hoje você alcançou {viewers} espectadores e gerou {diamonds} diamantes na transmissão. Parabéns pelo show! ❤️</textarea>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+                  <button class="btn btn-secondary" id="btnTestDmNow" title="Enviar mensagem de teste na DM agora para a sua conta vinculada">
+                    <span>📩 Enviar DM de Teste Agora</span>
+                  </button>
+                  <span style="font-size:11px; color:var(--text-muted);">Usa API oficial: <code>POST conversation/send_text_message</code></span>
+                </div>
+              </div>
+
+              <!-- Pré-visualização da Mensagem na DM -->
+              <div>
+                <div style="font-size:13px; font-weight:600; margin-bottom:8px; color:var(--text-secondary);">
+                  📱 Pré-visualização em Tempo Real (Como você receberá no SuperLive):
+                </div>
+                <div class="dm-preview-bubble-container">
+                  <div class="dm-preview-sender">
+                    <span class="bot-avatar-icon" style="width:24px; height:24px; font-size:12px;">🤖</span>
+                    <strong style="color:var(--accent);">𝑨́𝒕𝒊𝒍𝒂 (Robô Oficial)</strong>
+                    <span style="font-size:10px; color:var(--text-muted); margin-left:auto;">Agora mesmo</span>
+                  </div>
+                  <div class="dm-preview-message" id="botDmPreviewText">
+                    Live finalizada! Hoje você alcançou 142 espectadores e gerou 2.850 diamantes na transmissão. Parabéns pelo show! ❤️
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. DUAL CONSOLE: CHAT FEED AO VIVO & AUDITORIA DE MODERAÇÃO -->
+          <div id="sectionBotConsoles" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 24px;">
+            
+            <!-- Coluna 1: Feed de Chat em Tempo Real -->
+            <div class="glass-card" style="display:flex; flex-direction:column; height: 500px;">
+              <div class="chart-header" style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.06);">
+                <div>
+                  <h3 style="font-size:15px; font-weight:800; display:flex; align-items:center; gap:8px;">
+                    💬 Chat da Live em Tempo Real
+                  </h3>
+                  <p style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+                    Mensagens recebidas via WebSocket oficial e sincronização contínua.
+                  </p>
+                </div>
+                <div class="live-pill active" id="chatLiveBadge" style="font-size:11px;">
+                  <span class="pulse-dot"></span> LIVE CHAT
+                </div>
+              </div>
+
+              <!-- Feed Scrollable -->
+              <div class="console-scroll-box" id="botChatFeedContainer" style="flex:1; overflow-y:auto;">
+                <div class="empty-feed-placeholder" id="emptyChatPlaceholder">
+                  Nenhuma mensagem capturada no momento. O robô começará a receber quando a sua transmissão for detectada.
+                </div>
+              </div>
+
+              <!-- Envio Manual de Mensagem pelo Robô -->
+              <div style="display:flex; gap:8px; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06);">
+                <input type="text" id="inputManualChatMessage" class="custom-input" placeholder="Enviar mensagem no chat oficial como o Robô..." style="font-size:13px;">
+                <button class="btn btn-primary" id="btnSendManualChat" style="padding:6px 16px; font-size:13px; white-space:nowrap;">
+                  <span>Enviar</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Coluna 2: Log de Auditoria de Ações do Robô -->
+            <div class="glass-card" style="display:flex; flex-direction:column; height: 500px;">
+              <div class="chart-header" style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.06);">
+                <div>
+                  <h3 style="font-size:15px; font-weight:800; display:flex; align-items:center; gap:8px;">
+                    📜 Auditoria do Robô (Registro de Ações)
+                  </h3>
+                  <p style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+                    Histórico auditável de Mutes, Bans, Avisos da Fila e DMs executadas.
+                  </p>
+                </div>
+                <button class="btn btn-secondary" id="btnClearBotLogs" style="padding:4px 10px; font-size:11px;">
+                  <span>Limpar Logs</span>
+                </button>
+              </div>
+
+              <!-- Logs Scrollable -->
+              <div class="console-scroll-box" id="botAuditLogContainer" style="flex:1; overflow-y:auto;">
+                <div class="empty-feed-placeholder" id="emptyAuditPlaceholder">
+                  O registro de ações executadas pelo robô será exibido aqui em tempo real.
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 6. PÁGINA DEDICADA DE LOGS & ERROS DO SISTEMA -->
+          <div class="glass-card" id="sectionBotSystemLogs" style="margin-top: 24px;">
+            <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+              <div>
+                <h3 style="display:flex; align-items:center; gap:8px; margin:0; font-size:18px;">
+                  <span>📋</span> Console Central de Logs &amp; Erros
+                </h3>
+                <p style="margin:4px 0 0 0; font-size:13px; color:var(--text-secondary);">
+                  Diagnóstico completo em tempo real: conexões WebSocket, chamadas de API, gatilhos de moderação e erros do servidor.
+                </p>
+              </div>
+
+              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-secondary); cursor:pointer;">
+                  <input type="checkbox" id="chkAutoScrollLogs" checked style="accent-color:var(--accent);"> Auto-scroll
+                </label>
+                <button class="btn btn-secondary btn-sm" id="btnRefreshSystemLogs" title="Recarregar logs do servidor">
+                  <span>🔄 Atualizar</span>
+                </button>
+                <button class="btn btn-secondary btn-sm" id="btnCopySystemLogs" title="Copiar logs completos para a área de transferência">
+                  <span>📋 Copiar</span>
+                </button>
+                <button class="btn btn-secondary btn-sm" id="btnDownloadSystemLogs" title="Baixar relatório em formato .txt">
+                  <span>💾 Baixar (.txt)</span>
+                </button>
+                <button class="btn btn-secondary btn-sm" id="btnClearSystemLogs" title="Limpar buffer de logs do sistema" style="color:var(--danger);">
+                  <span>🧹 Limpar</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Diagnóstico Rápido / Status Cards -->
+            <div class="syslog-stats-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin:16px 0;">
+              <div class="syslog-stat-card">
+                <span class="syslog-stat-label">Conexão WebSocket</span>
+                <div class="syslog-stat-value" id="syslogWsStatus">
+                  <span class="live-dot-pulse"></span> ONLINE
+                </div>
+                <small id="syslogWsDetail" style="font-size:11px; color:var(--text-muted);">wss://ws.sprlv-api.com</small>
+              </div>
+
+              <div class="syslog-stat-card">
+                <span class="syslog-stat-label">Status da Moderação</span>
+                <div class="syslog-stat-value" id="syslogEngineStatus" style="color:var(--accent);">
+                  PRONTO
+                </div>
+                <small id="syslogEngineDetail" style="font-size:11px; color:var(--text-muted);">Monitorando requisições</small>
+              </div>
+
+              <div class="syslog-stat-card">
+                <span class="syslog-stat-label">Erros Detectados</span>
+                <div class="syslog-stat-value" id="syslogErrorCount" style="color:var(--text-primary);">
+                  0
+                </div>
+                <small id="syslogErrorDetail" style="font-size:11px; color:var(--text-muted);">Sistema saudável</small>
+              </div>
+
+              <div class="syslog-stat-card">
+                <span class="syslog-stat-label">Total de Registros</span>
+                <div class="syslog-stat-value" id="syslogTotalLogs">
+                  0
+                </div>
+                <small style="font-size:11px; color:var(--text-muted);">Buffer em memória</small>
+              </div>
+            </div>
+
+            <!-- Filtros & Pesquisa -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+              <div class="syslog-filters" style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="syslog-filter-btn active" data-filter="ALL">Todos</button>
+                <button class="syslog-filter-btn" data-filter="ERROR" style="color:#f87171;">🚨 Erros</button>
+                <button class="syslog-filter-btn" data-filter="WARN" style="color:#fbbf24;">⚠️ Avisos</button>
+                <button class="syslog-filter-btn" data-filter="WS" style="color:#60a5fa;">🔌 WebSocket</button>
+                <button class="syslog-filter-btn" data-filter="API" style="color:#a78bfa;">🌐 API REST</button>
+                <button class="syslog-filter-btn" data-filter="MOD" style="color:#34d399;">🛡️ Moderação</button>
+                <button class="syslog-filter-btn" data-filter="QUEUE" style="color:#f472b6;">🔁 Fila</button>
+              </div>
+
+              <div style="position:relative; min-width:240px;">
+                <input type="text" id="syslogSearchInput" class="custom-input" placeholder="🔍 Filtrar logs..." style="width:100%; font-size:12px; padding:6px 12px;" />
+              </div>
+            </div>
+
+            <!-- Terminal do Console de Logs -->
+            <div class="syslog-terminal" id="syslogTerminal">
+              <div class="syslog-terminal-header">
+                <div class="terminal-dots">
+                  <span class="tdot red"></span>
+                  <span class="tdot yellow"></span>
+                  <span class="tdot green"></span>
+                </div>
+                <div class="terminal-title">superclient@engine:~# system-logs --stream</div>
+                <div style="font-size:11px; color:rgba(255,255,255,0.4);" id="syslogLiveClock">--:--:--</div>
+              </div>
+              <div class="syslog-terminal-body" id="syslogTerminalBody">
+                <div class="syslog-empty">Nenhum log registrado ainda.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- ========================================================
+       PREVIEW DA LIVE E DO CHAT AO VIVO NO CANTINHO (FLOATING CORNER WIDGET)
+       ======================================================== -->
+  <aside class="corner-live-widget" id="cornerLiveWidget">
+    <!-- Header do Widget Flutuante -->
+    <div class="corner-widget-header" id="cornerWidgetHeader">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="live-dot-pulse" id="cornerHeaderLiveDot"></span>
+        <strong style="font-size:12px; letter-spacing:0.5px;" id="cornerHeaderTitle">LIVE &amp; CHAT AO VIVO</strong>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <button class="corner-action-btn" id="btnMinimizeCorner" title="Minimizar / Expandir Widget">_</button>
+        <button class="corner-action-btn" id="btnCloseCorner" title="Fechar Preview do Canto">&times;</button>
+      </div>
+    </div>
+
+    <!-- Conteúdo do Widget Flutuante (Corpo) -->
+    <div class="corner-widget-body" id="cornerWidgetBody">
+      <!-- 1. Frame de Vídeo / Preview da Live -->
+      <div class="corner-video-frame" id="cornerVideoFrame">
+        <!-- Thumbnail / Imagem de Fundo com Blur -->
+        <div class="corner-video-bg" id="cornerVideoBg"></div>
+        
+        <!-- Overlay com Informações da Transmissão -->
+        <div class="corner-video-overlay">
+          <div class="corner-video-top">
+            <span class="live-pill offline" id="cornerVideoLivePill">
+              <span class="pulse-dot"></span> <span id="cornerVideoLiveText">OFFLINE</span>
+            </span>
+            <div class="corner-video-viewers" id="cornerVideoViewersBadge" style="display:none;">
+              👥 <span id="cornerVideoViewersCount">0</span>
+            </div>
+          </div>
+
+          <!-- Centro do Frame: Avatar da Criadora com Ondas Sonoras / Equalizer -->
+          <div class="corner-streamer-center">
+            <div class="corner-streamer-avatar-box">
+              <div class="corner-avatar-circle" id="cornerStreamerAvatar">👤</div>
+              <div class="corner-sound-waves" id="cornerAudioWaves">
+                <span class="sound-bar b1"></span>
+                <span class="sound-bar b2"></span>
+                <span class="sound-bar b3"></span>
+                <span class="sound-bar b4"></span>
+                <span class="sound-bar b5"></span>
+              </div>
+            </div>
+            <div class="corner-streamer-name" id="cornerStreamerName">Aguardando sua Live</div>
+            <div class="corner-streamer-title" id="cornerStreamerTitle">Inicie a transmissão no app SuperLive</div>
+          </div>
+
+          <div class="corner-video-bottom">
+            <div class="corner-diamonds-tag" id="cornerDiamondsTag">
+              💎 <span id="cornerDiamondsCount">0</span> diamantes
+            </div>
+            <div style="font-size:10px; color:rgba(255,255,255,0.7); font-family:var(--font-mono);" id="cornerLiveIdTag">
+              ID: --
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Chat ao Vivo Compacto no Cantinho -->
+      <div class="corner-chat-box">
+        <div class="corner-chat-header">
+          <span>💬 Chat em Tempo Real</span>
+          <span id="cornerChatCount" style="font-size:10px; color:var(--text-muted); font-family:monospace;">0 msgs</span>
+        </div>
+        <div class="corner-chat-messages" id="cornerChatMessages">
+          <div class="corner-chat-empty" id="cornerChatEmpty">
+            O chat da live aparecerá aqui assim que você iniciar a transmissão.
+          </div>
+        </div>
+        <!-- Envio Rápido no Canto -->
+        <div class="corner-chat-input-row">
+          <input type="text" id="cornerInputChat" placeholder="Enviar no chat como Robô..." />
+          <button id="cornerBtnSendChat" title="Enviar Mensagem">➤</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <script src="app.js?v=2.32.0"></script>
+</body>
+</html>
