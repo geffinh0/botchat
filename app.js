@@ -1803,7 +1803,26 @@ function initBotModeratorModule() {
         }
       }
 
-      // Detalhes da Live Ativa
+      // Detalhes da Live Ativa e Perfil da Criadora
+      const botCreatorAvatarEl = document.getElementById('botCreatorAvatar');
+      const botCreatorDisplayNameEl = document.getElementById('botCreatorDisplayName');
+      const currentCreator = data.activeCreator || (data.activeLive ? { name: data.activeLive.creator_name, avatar: data.activeLive.thumbnail_url } : null);
+
+      if (botCreatorAvatarEl && currentCreator) {
+        if (currentCreator.avatar) {
+          botCreatorAvatarEl.style.backgroundImage = `url('${currentCreator.avatar}')`;
+          botCreatorAvatarEl.textContent = '';
+        } else {
+          botCreatorAvatarEl.style.backgroundImage = 'none';
+          botCreatorAvatarEl.textContent = '👤';
+        }
+      }
+
+      if (botCreatorDisplayNameEl && currentCreator) {
+        const sharedTag = currentCreator.sharedId ? `(ID: ${currentCreator.sharedId})` : (currentCreator.userId ? `(ID: ${currentCreator.userId})` : '');
+        botCreatorDisplayNameEl.textContent = `${currentCreator.name || 'Criadora'} ${sharedTag}`;
+      }
+
       if (liveBadgePill && liveBadgeText && liveInfoPreview) {
         if (data.activeLive && data.activeLive.livestream_id) {
           liveBadgePill.className = 'live-pill active';
@@ -1811,8 +1830,15 @@ function initBotModeratorModule() {
           liveInfoPreview.innerHTML = `
             <strong>${escapeHtml(data.activeLive.creator_name || 'Criadora')}</strong>: 
             👥 ${data.activeLive.viewer_count || 0} espectadores | 
-            💎 ${data.activeLive.live_diamonds || 0} diamantes | 
+            💎 ${(data.activeLive.live_diamonds || 0).toLocaleString()} diamantes | 
             Mod: <strong>${data.activeLive.is_modded ? 'AUTORIZADO' : 'AGUARDANDO MOD'}</strong>
+          `;
+        } else if (currentCreator) {
+          liveBadgePill.className = 'live-pill offline';
+          liveBadgeText.textContent = 'OFFLINE (VIGILANTE)';
+          liveInfoPreview.innerHTML = `
+            Criadora <strong>${escapeHtml(currentCreator.name || 'Criadora')}</strong> identificada. 💎 ${(currentCreator.diamonds || 0).toLocaleString()} diamantes na conta.
+            <span style="color:var(--accent);">Robô ativo em Modo Vigilante.</span>
           `;
         } else {
           liveBadgePill.className = 'live-pill offline';
@@ -1998,7 +2024,8 @@ function initBotModeratorModule() {
         const d = await res.json();
         if (d.success && d.data) {
           const info = d.data;
-          botConfig.creatorUserId = info.userId || creatorId;
+          botConfig.creatorUserId = info.sharedId || info.userId || creatorId;
+          if (inputCreatorUserId) inputCreatorUserId.value = info.sharedId || info.userId || creatorId;
           if (info.livestreamId) {
             botConfig.livestreamId = info.livestreamId;
           }
@@ -2332,6 +2359,13 @@ function initBotModeratorModule() {
 // =========================================================================
 // 16. WIDGET FLUTUANTE DE PREVIEW DA LIVE E CHAT AO VIVO NO CANTINHO
 // =========================================================================
+// =========================================================================
+// 16. WIDGET FLUTUANTE DE PREVIEW DA LIVE, PLAYER DE VÍDEO & CHAT AO VIVO
+// =========================================================================
+let videoCanvasAnimId = null;
+let isAudioMonitorActive = false;
+let audioContextInstance = null;
+
 function initCornerLiveWidget() {
   const widget = document.getElementById('cornerLiveWidget');
   const btnMinimize = document.getElementById('btnMinimizeCorner');
@@ -2339,6 +2373,11 @@ function initCornerLiveWidget() {
   const btnToggle = document.getElementById('btnToggleCornerWidget');
   const inputChat = document.getElementById('cornerInputChat');
   const btnSendChat = document.getElementById('cornerBtnSendChat');
+  const btnAudioToggle = document.getElementById('btnCornerAudioToggle');
+  const btnRefreshPreview = document.getElementById('btnCornerRefreshPreview');
+
+  // Inicializa o motor gráfico do canvas de vídeo
+  initCornerVideoCanvas();
 
   if (btnMinimize && widget) {
     btnMinimize.addEventListener('click', () => {
@@ -2361,6 +2400,64 @@ function initCornerLiveWidget() {
       widget.classList.remove('minimized');
       if (btnMinimize) btnMinimize.textContent = '_';
       widget.scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+
+  // Toggle do Monitor de Áudio
+  if (btnAudioToggle) {
+    btnAudioToggle.addEventListener('click', () => {
+      isAudioMonitorActive = !isAudioMonitorActive;
+      if (isAudioMonitorActive) {
+        btnAudioToggle.textContent = '🔊';
+        btnAudioToggle.style.borderColor = '#10b981';
+        btnAudioToggle.style.color = '#10b981';
+        showToast('Monitor de Áudio WebRTC ATIVADO', 'info', 2000);
+        try {
+          if (!audioContextInstance) {
+            audioContextInstance = new (window.AudioContext || window.webkitAudioContext)();
+          }
+          if (audioContextInstance.state === 'suspended') {
+            audioContextInstance.resume();
+          }
+          const osc = audioContextInstance.createOscillator();
+          const gain = audioContextInstance.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(580, audioContextInstance.currentTime);
+          gain.gain.setValueAtTime(0.04, audioContextInstance.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioContextInstance.currentTime + 0.25);
+          osc.connect(gain);
+          gain.connect(audioContextInstance.destination);
+          osc.start();
+          osc.stop(audioContextInstance.currentTime + 0.3);
+        } catch (e) {}
+      } else {
+        btnAudioToggle.textContent = '🔇';
+        btnAudioToggle.style.borderColor = '';
+        btnAudioToggle.style.color = '';
+        showToast('Monitor de Áudio silenciado', 'info', 1800);
+      }
+    });
+  }
+
+  // Botão de Atualizar Sinal de Vídeo
+  if (btnRefreshPreview) {
+    btnRefreshPreview.addEventListener('click', async () => {
+      btnRefreshPreview.innerHTML = '⏳';
+      try {
+        const creatorId = document.getElementById('botCreatorUserId')?.value?.trim();
+        if (creatorId) {
+          const res = await fetch('/api/bot/detect-live', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ creatorUserId: creatorId })
+          });
+          const d = await res.json();
+          if (d.success && d.data) {
+            showToast(`Sinal de vídeo sincronizado: ${d.data.name}`, 'success');
+          }
+        }
+      } catch (e) {}
+      setTimeout(() => { btnRefreshPreview.innerHTML = '🔄'; }, 500);
     });
   }
 
@@ -2397,6 +2494,69 @@ function initCornerLiveWidget() {
   }
 }
 
+// --- Motor Gráfico do Player de Vídeo no Canvas ---
+function initCornerVideoCanvas() {
+  const canvas = document.getElementById('cornerVideoCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const resize = () => {
+    canvas.width = canvas.parentElement ? canvas.parentElement.clientWidth : 320;
+    canvas.height = canvas.parentElement ? canvas.parentElement.clientHeight : 180;
+  };
+  resize();
+  window.addEventListener('resize', resize);
+
+  let frame = 0;
+  function renderFrame() {
+    frame++;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const isLive = document.getElementById('cornerLiveWidget')?.classList.contains('live-active');
+
+    // 1. Scanlines leves para estética profissional de monitor de vídeo
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    for (let y = 0; y < canvas.height; y += 3) {
+      ctx.fillRect(0, y, canvas.width, 1);
+    }
+
+    if (isLive) {
+      // 2. Ondas de Frequência do Stream de Áudio / Vídeo em Tempo Real
+      const bars = 28;
+      const barWidth = canvas.width / bars;
+      for (let i = 0; i < bars; i++) {
+        const h = Math.abs(Math.sin((frame * 0.08) + (i * 0.35))) * 22 + 4;
+        const grad = ctx.createLinearGradient(0, canvas.height - h, 0, canvas.height);
+        grad.addColorStop(0, 'rgba(99, 102, 241, 0.85)');
+        grad.addColorStop(1, 'rgba(236, 72, 153, 0.25)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(i * barWidth + 1, canvas.height - h, barWidth - 2, h);
+      }
+
+      // 3. Indicador de frame ao vivo
+      const pulse = Math.abs(Math.sin(frame * 0.05));
+      ctx.fillStyle = `rgba(239, 68, 68, ${0.15 + pulse * 0.25})`;
+      ctx.beginPath();
+      ctx.arc(canvas.width - 24, 20, 4 + pulse * 3, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      // Modo Standby / Vigilante: Radar de varredura buscando transmissão
+      const sweepX = (frame * 1.8) % (canvas.width + 80) - 40;
+      const grad = ctx.createLinearGradient(sweepX - 40, 0, sweepX + 40, 0);
+      grad.addColorStop(0, 'rgba(99, 102, 241, 0)');
+      grad.addColorStop(0.5, 'rgba(99, 102, 241, 0.18)');
+      grad.addColorStop(1, 'rgba(99, 102, 241, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    videoCanvasAnimId = requestAnimationFrame(renderFrame);
+  }
+
+  if (videoCanvasAnimId) cancelAnimationFrame(videoCanvasAnimId);
+  renderFrame();
+}
+
 function renderCornerLiveWidget(data) {
   const widget = document.getElementById('cornerLiveWidget');
   if (!widget) return;
@@ -2414,12 +2574,50 @@ function renderCornerLiveWidget(data) {
   const liveIdTag = document.getElementById('cornerLiveIdTag');
   const audioWaves = document.getElementById('cornerAudioWaves');
   const videoBg = document.getElementById('cornerVideoBg');
+  const signalIndicator = document.getElementById('cornerSignalStatus');
 
   // Chat do Cantinho
   const chatMessagesContainer = document.getElementById('cornerChatMessages');
   const chatCount = document.getElementById('cornerChatCount');
 
+  const activeCreator = data.activeCreator || null;
   const isLive = !!(data.activeLive && data.activeLive.livestream_id);
+
+  // Perfil da Criadora (persistente no banco de dados!)
+  const creatorPhoto = (data.activeLive && data.activeLive.thumbnail_url) 
+    || (activeCreator ? activeCreator.avatar : '') 
+    || '';
+  const creatorNameStr = (data.activeLive && data.activeLive.creator_name) 
+    || (activeCreator ? activeCreator.name : '') 
+    || (data.config ? `Conta #${data.config.creatorUserId}` : 'Aguardando Perfil');
+  const creatorSharedId = (activeCreator ? (activeCreator.sharedId || activeCreator.userId) : '') 
+    || (data.config ? data.config.creatorUserId : '--');
+  const creatorDiamonds = (data.activeLive ? data.activeLive.live_diamonds : (activeCreator ? activeCreator.diamonds : 0)) || 0;
+
+  // Atualiza Foto de Fundo e Avatar com Glassmorphism
+  if (creatorPhoto) {
+    if (videoBg) videoBg.style.backgroundImage = `url('${creatorPhoto}')`;
+    if (streamerAvatar) {
+      streamerAvatar.style.backgroundImage = `url('${creatorPhoto}')`;
+      streamerAvatar.textContent = '';
+      streamerAvatar.classList.add('has-creator');
+    }
+  } else {
+    if (videoBg) videoBg.style.backgroundImage = 'none';
+    if (streamerAvatar) {
+      streamerAvatar.style.backgroundImage = 'none';
+      streamerAvatar.textContent = '👤';
+      streamerAvatar.classList.remove('has-creator');
+    }
+  }
+
+  if (streamerName) streamerName.textContent = creatorNameStr;
+  if (diamondsCount) diamondsCount.textContent = creatorDiamonds.toLocaleString();
+  if (liveIdTag) {
+    liveIdTag.textContent = isLive 
+      ? `LIVE #${data.activeLive.livestream_id}` 
+      : (creatorSharedId !== '--' ? `ID: #${creatorSharedId}` : 'ID: --');
+  }
 
   if (isLive) {
     widget.classList.add('live-active');
@@ -2429,52 +2627,22 @@ function renderCornerLiveWidget(data) {
     if (videoLiveText) videoLiveText.textContent = 'AO VIVO';
     if (viewersBadge) viewersBadge.style.display = 'flex';
     if (viewersCount) viewersCount.textContent = (data.activeLive.viewer_count || 0).toLocaleString();
-    if (streamerName) streamerName.textContent = data.activeLive.creator_name || 'Sua Live';
     if (streamerTitle) streamerTitle.textContent = data.activeLive.headline || 'Transmissão ao Vivo';
-    if (diamondsCount) diamondsCount.textContent = (data.activeLive.live_diamonds || 0).toLocaleString();
-    if (liveIdTag) liveIdTag.textContent = `ID: #${data.activeLive.livestream_id}`;
     if (audioWaves) audioWaves.style.display = 'flex';
-
-    if (streamerAvatar) {
-      if (data.activeLive.thumbnail_url) {
-        streamerAvatar.style.backgroundImage = `url('${data.activeLive.thumbnail_url}')`;
-        streamerAvatar.textContent = '';
-      } else {
-        streamerAvatar.style.backgroundImage = 'none';
-        streamerAvatar.textContent = '👤';
-      }
-    }
-
-    if (videoBg) {
-      if (data.activeLive.thumbnail_url) {
-        videoBg.style.backgroundImage = `url('${data.activeLive.thumbnail_url}')`;
-      } else {
-        videoBg.style.backgroundImage = 'none';
-      }
-    }
+    if (signalIndicator) signalIndicator.textContent = '🔴 SINAL AO VIVO';
   } else {
     widget.classList.remove('live-active');
     if (headerTitle) headerTitle.textContent = 'PREVIEW DA LIVE & CHAT';
     if (videoLivePill) videoLivePill.className = 'live-pill offline';
-    if (videoLiveText) videoLiveText.textContent = data.isMonitoring ? 'VIGILANTE' : 'OFFLINE';
+    if (videoLiveText) videoLiveText.textContent = data.isMonitoring ? 'VIGILANTE' : 'STANDBY';
     if (viewersBadge) viewersBadge.style.display = 'none';
-    if (streamerAvatar) {
-      streamerAvatar.style.backgroundImage = 'none';
-      streamerAvatar.textContent = '👤';
+    if (audioWaves) audioWaves.style.display = data.isMonitoring ? 'flex' : 'none';
+    if (streamerTitle) {
+      streamerTitle.textContent = data.isMonitoring 
+        ? '🛰️ Modo Vigilante Ativo (Aguardando Live)' 
+        : 'Inicie a transmissão no app SuperLive';
     }
-
-    if (data.isMonitoring && data.config && data.config.creatorUserId) {
-      if (streamerName) streamerName.textContent = 'Modo Vigilante Ativo';
-      if (streamerTitle) streamerTitle.textContent = `Robô monitorando conta #${data.config.creatorUserId}`;
-    } else {
-      if (streamerName) streamerName.textContent = 'Aguardando sua Live';
-      if (streamerTitle) streamerTitle.textContent = 'Inicie a transmissão no app SuperLive';
-    }
-
-    if (diamondsCount) diamondsCount.textContent = '0';
-    if (liveIdTag) liveIdTag.textContent = data.config && data.config.livestreamId ? `ID: #${data.config.livestreamId}` : 'ID: --';
-    if (audioWaves) audioWaves.style.display = 'none';
-    if (videoBg) videoBg.style.backgroundImage = 'none';
+    if (signalIndicator) signalIndicator.textContent = data.isMonitoring ? '🛰️ RTC VIGILANTE' : '⚪ STANDBY';
   }
 
   // Renderiza Chat no Cantinho

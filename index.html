@@ -147,12 +147,20 @@
               </div>
 
               <div class="bot-live-status-card" id="botActiveLiveCard">
-                <div class="live-pill offline" id="botLiveBadgePill">
-                  <span class="pulse-dot"></span>
-                  <span id="botLiveBadgeText">NENHUMA LIVE DETECTADA</span>
-                </div>
-                <div class="live-info-preview" id="botLiveInfoPreview">
-                  Abra sua live no app e clique em <strong>Detectar Live Ativa</strong> para o robô conectar.
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <div class="bot-creator-avatar-preview" id="botCreatorAvatar">👤</div>
+                  <div>
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:3px;">
+                      <span class="bot-creator-display-name" id="botCreatorDisplayName">Carregando Perfil...</span>
+                      <div class="live-pill offline" id="botLiveBadgePill">
+                        <span class="pulse-dot"></span>
+                        <span id="botLiveBadgeText">OFFLINE (VIGILANTE)</span>
+                      </div>
+                    </div>
+                    <div class="live-info-preview" id="botLiveInfoPreview">
+                      Robô pronto em Modo Vigilante. Inicie a live para conectar automaticamente.
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -583,14 +591,24 @@
         <!-- Thumbnail / Imagem de Fundo com Blur -->
         <div class="corner-video-bg" id="cornerVideoBg"></div>
         
-        <!-- Overlay com Informações da Transmissão -->
+        <!-- Canvas Animado do Player de Vídeo e Visualizador de Frequência -->
+        <canvas class="corner-video-canvas" id="cornerVideoCanvas"></canvas>
+
+        <!-- Overlay com Informações da Transmissão e Controles -->
         <div class="corner-video-overlay">
           <div class="corner-video-top">
-            <span class="live-pill offline" id="cornerVideoLivePill">
-              <span class="pulse-dot"></span> <span id="cornerVideoLiveText">OFFLINE</span>
-            </span>
-            <div class="corner-video-viewers" id="cornerVideoViewersBadge" style="display:none;">
-              👥 <span id="cornerVideoViewersCount">0</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span class="live-pill offline" id="cornerVideoLivePill">
+                <span class="pulse-dot"></span> <span id="cornerVideoLiveText">STANDBY</span>
+              </span>
+              <span class="corner-video-tag-hd" id="cornerVideoHdTag">HD 1080p</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <div class="corner-video-viewers" id="cornerVideoViewersBadge" style="display:none;">
+                👥 <span id="cornerVideoViewersCount">0</span>
+              </div>
+              <button class="corner-media-btn" id="btnCornerAudioToggle" title="Monitor de Áudio (Ativar / Desativar Som)">🔇</button>
+              <button class="corner-media-btn" id="btnCornerRefreshPreview" title="Atualizar Sinal do Vídeo">🔄</button>
             </div>
           </div>
 
@@ -606,16 +624,19 @@
                 <span class="sound-bar b5"></span>
               </div>
             </div>
-            <div class="corner-streamer-name" id="cornerStreamerName">Aguardando sua Live</div>
-            <div class="corner-streamer-title" id="cornerStreamerTitle">Inicie a transmissão no app SuperLive</div>
+            <div class="corner-streamer-name" id="cornerStreamerName">Carregando Perfil...</div>
+            <div class="corner-streamer-title" id="cornerStreamerTitle">Aguardando Sinal de Transmissão</div>
           </div>
 
           <div class="corner-video-bottom">
             <div class="corner-diamonds-tag" id="cornerDiamondsTag">
               💎 <span id="cornerDiamondsCount">0</span> diamantes
             </div>
-            <div style="font-size:10px; color:rgba(255,255,255,0.7); font-family:var(--font-mono);" id="cornerLiveIdTag">
-              ID: --
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="corner-signal-indicator" id="cornerSignalStatus">🛰️ RTC ONLINE</span>
+              <div style="font-size:10px; color:rgba(255,255,255,0.7); font-family:var(--font-mono);" id="cornerLiveIdTag">
+                ID: --
+              </div>
             </div>
           </div>
         </div>

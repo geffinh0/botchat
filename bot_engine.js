@@ -8,6 +8,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const db = require('./db');
 
 const CONFIG_FILE = path.join(__dirname, 'bot_config.json');
 const REMOTE_API_HOST = 'api.sprlv-api.com';
@@ -52,14 +53,14 @@ class BotEngine {
     this.heartbeatTimer = null;
     this.syncPollTimer = null;
     this.recurringTimer = null;
-    this.countdownSeconds = this.config.recurringIntervalSeconds;
+    this.countdownSeconds = this.config.recurringIntervalSeconds || 120;
 
     this.activeLive = null;
     this.isMonitoring = false;
     this.processedMessageIds = new Set();
     this.chatFeed = [];
-    this.moderationLogs = [];
-    this.systemLogs = [];
+    this.moderationLogs = db.getAuditLogs(100);
+    this.systemLogs = db.getSystemLogs(200);
     this.stats = {
       messagesAnalyzed: 0,
       usersMuted: 0,
@@ -108,34 +109,18 @@ class BotEngine {
 
   loadConfig() {
     try {
-      if (fs.existsSync(CONFIG_FILE)) {
-        const raw = fs.readFileSync(CONFIG_FILE, 'utf-8');
-        return { ...DEFAULT_CONFIG, ...JSON.parse(raw) };
-      }
+      return db.getConfig();
     } catch (e) {
-      console.error('[BOT] Erro ao carregar bot_config.json:', e.message);
+      console.error('[BOT] Erro ao carregar config do db:', e.message);
+      return { ...DEFAULT_CONFIG };
     }
-    return { ...DEFAULT_CONFIG };
   }
 
   saveConfig(newConfig, shouldRestartQueue = true) {
-    // Preserva mensagens caso venham vazias acidentalmente
-    if (newConfig.recurringMessages && Array.isArray(newConfig.recurringMessages) && newConfig.recurringMessages.length > 0) {
-      this.config.recurringMessages = newConfig.recurringMessages;
-    } else if (!this.config.recurringMessages || this.config.recurringMessages.length === 0) {
-      this.config.recurringMessages = [...DEFAULT_CONFIG.recurringMessages];
-    }
-
     const previousToken = this.config.botToken;
-    this.config = { ...this.config, ...newConfig };
-    try {
-      fs.writeFileSync(CONFIG_FILE, JSON.stringify(this.config, null, 2), 'utf-8');
-      console.log('[BOT] Configurações persistidas com sucesso em bot_config.json');
-    } catch (e) {
-      console.error('[BOT] Erro ao salvar bot_config.json:', e.message);
-    }
+    this.config = db.saveConfig(newConfig);
 
-    if (newConfig.botToken && newConfig.botToken !== previousToken) {
+    if (newConfig && newConfig.botToken && newConfig.botToken !== previousToken) {
       this.authFailed = false;
       if (this.ws) {
         try { this.ws.close(); } catch (e) {}
@@ -584,6 +569,7 @@ class BotEngine {
 
     if (isSuccess) {
       this.stats.announcementsSent++;
+      db.incrementRecurringSendCount(idx);
       this.logAction('ANNOUNCEMENT', `Aviso #${idx + 1} disparado com sucesso: "${msgToSend}"`, '', 'SUCESSO');
     } else {
       this.logAction('ANNOUNCEMENT', `Falha ao disparar aviso #${idx + 1}: ${res && res.error ? (res.error.message || JSON.stringify(res.error)) : 'Erro desconhecido'}`, '', 'ERRO');
@@ -704,22 +690,29 @@ class BotEngine {
       }
     } catch (e) {}
 
-    // 2. Busca por users/search (compatível com shared_id "93319686", username "ju_suni", nome, ou ID)
+    // 2. Busca por users/search (busca exata por shared_id, username ou nome)
     if (!targetUser) {
       try {
         const searchRes = await this.apiRequest('users/search', { search_query: raw });
         if (searchRes && searchRes.items && searchRes.items.length > 0) {
-          // Busca correspondência exata por shared_id, user_id ou username, ou utiliza o primeiro item retornado
-          const exact = searchRes.items.find(it => 
+          // Busca prioritária por correspondência EXATA de shared_id, user_id ou username
+          let match = searchRes.items.find(it => 
             String(it.shared_id) === raw || 
             String(it.user_id) === raw || 
             (it.username && String(it.username).toLowerCase() === raw.toLowerCase())
-          ) || searchRes.items[0];
+          );
 
-          if (exact) {
-            targetUser = exact;
-            if (exact.livestream_id) {
-              targetLiveId = String(exact.livestream_id);
+          // Se a busca não for puramente numérica (ex: nome de usuário textual)
+          if (!match && isNaN(Number(raw))) {
+            match = searchRes.items.find(it => 
+              it.name && it.name.toLowerCase().includes(raw.toLowerCase())
+            ) || searchRes.items[0];
+          }
+
+          if (match) {
+            targetUser = match;
+            if (match.livestream_id) {
+              targetLiveId = String(match.livestream_id);
             }
           }
         }
@@ -728,14 +721,17 @@ class BotEngine {
       }
     }
 
-    // 3. Tenta users/profile diretamente caso o identificador seja o user_id interno
+    // 3. Tenta users/profile diretamente caso seja um ID numérico interno
     if (!targetUser) {
       try {
         const profRes = await this.apiRequest('users/profile', { user_id: raw });
         if (profRes && profRes.user && !profRes.error) {
-          targetUser = profRes.user;
-          if (profRes.user.livestream_id) {
-            targetLiveId = String(profRes.user.livestream_id);
+          // Validação rigorosa: só aceita se o perfil retornado realmente bater com o ID buscado
+          if (String(profRes.user.user_id) === raw || String(profRes.user.shared_id) === raw) {
+            targetUser = profRes.user;
+            if (profRes.user.livestream_id) {
+              targetLiveId = String(profRes.user.livestream_id);
+            }
           }
         }
       } catch (e) {}
@@ -771,7 +767,7 @@ class BotEngine {
 
       this.logSystem('SYSTEM', 'SUCCESS', `Perfil localizado: "${targetUser.name}" (ID: ${targetUser.user_id}, Shared: ${targetUser.shared_id || raw}). Ao vivo: ${isLive ? 'SIM (#' + targetLiveId + ')' : 'NÃO (Vigilante)'}`);
 
-      return {
+      const creatorResult = {
         userId: String(targetUser.user_id),
         sharedId: String(targetUser.shared_id || raw),
         name: targetUser.name || 'Criadora',
@@ -786,6 +782,11 @@ class BotEngine {
         followers: targetUser.follower_count || 0,
         is_modded: streamDetails ? !!streamDetails.is_modded : false
       };
+
+      // Persiste perfil da criadora no banco de dados
+      db.setActiveCreator(creatorResult);
+
+      return creatorResult;
     }
 
     throw new Error(`Nenhum perfil ou live encontrado com o identificador: "${raw}". Verifique se o ID ou nome de usuário está correto.`);
@@ -1018,6 +1019,20 @@ class BotEngine {
 
     this.logAction('SYSTEM', `Live #${liveId} encerrada! Estatísticas: ${finalViewers} espectadores únicos, ${finalDiamonds} diamantes, duração ${durationStr}.`, '', 'LIVE_ENDED');
 
+    // Registra sessão no banco de dados persistente
+    try {
+      db.recordLiveSession({
+        livestream_id: liveId,
+        creator_name: creatorName,
+        creator_user_id: creatorUserId,
+        headline: this.activeLive.headline,
+        peak_viewers: finalViewers,
+        total_diamonds: finalDiamonds,
+        started_at: this.activeLive.started_at,
+        duration: durationStr
+      });
+    } catch (e) {}
+
     // Envio de DM à criadora
     if (this.config.dmEnabled && creatorUserId) {
       await this.sendEndOfLiveDM({
@@ -1098,10 +1113,8 @@ class BotEngine {
       status: status,
       details: details
     };
-    this.moderationLogs.unshift(entry);
-    if (this.moderationLogs.length > 200) {
-      this.moderationLogs.pop();
-    }
+    db.addAuditLog(entry);
+    this.moderationLogs = db.getAuditLogs(100);
   }
 
   // --- Logger Central de Diagnóstico e Erros do Sistema ---
@@ -1116,10 +1129,8 @@ class BotEngine {
       details: details ? (typeof details === 'object' ? JSON.stringify(details) : String(details)) : null
     };
 
-    this.systemLogs.unshift(entry);
-    if (this.systemLogs.length > 500) {
-      this.systemLogs.pop();
-    }
+    db.addSystemLog(entry);
+    this.systemLogs = db.getSystemLogs(200);
 
     // Log no terminal do Node com formatação
     const prefix = `[${entry.category}][${entry.level}]`;
@@ -1135,12 +1146,12 @@ class BotEngine {
   }
 
   getSystemLogs() {
-    return this.systemLogs;
+    return db.getSystemLogs(200);
   }
 
   clearSystemLogs() {
-    this.systemLogs = [];
-    this.logSystem('SYSTEM', 'INFO', 'Histórico de logs do sistema limpo com sucesso.');
+    db.clearSystemLogs();
+    this.systemLogs = db.getSystemLogs(200);
     return true;
   }
 
@@ -1151,12 +1162,16 @@ class BotEngine {
       wsConnected: this.wsConnected,
       authFailed: !!this.authFailed,
       activeLive: this.activeLive,
-      config: this.config,
+      activeCreator: db.getActiveCreator(),
+      config: db.getConfig(),
+      recurringMessages: db.getRecurringMessages(),
+      moderationRules: db.getModerationRules(),
+      liveSessions: db.getLiveSessions(),
       stats: this.stats,
       countdownSeconds: this.countdownSeconds,
       chatFeed: this.chatFeed.slice(0, 50),
-      recentLogs: this.moderationLogs.slice(0, 50),
-      systemLogs: this.systemLogs.slice(0, 100),
+      recentLogs: db.getAuditLogs(50),
+      systemLogs: db.getSystemLogs(100),
       errorCount: this.systemLogs.filter(l => l.level === 'ERROR').length
     };
   }

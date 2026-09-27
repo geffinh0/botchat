@@ -1,0 +1,411 @@
+{
+  "version": "2.0.0",
+  "last_updated": "2026-09-27T00:19:55.720Z",
+  "config": {
+    "creatorUserId": "35729338",
+    "livestreamId": "151690318",
+    "autoDetectLive": true,
+    "moderationEnabled": false,
+    "caseSensitive": false,
+    "exactMatch": false,
+    "recurringEnabled": false,
+    "recurringIntervalSeconds": 120,
+    "recurringCurrentIndex": 0,
+    "dmEnabled": false,
+    "dmTemplate": "Live finalizada! Hoje você alcançou {viewers} espectadores e gerou {diamonds} diamantes na transmissão. Parabéns pelo show! ❤️",
+    "botToken": "1a5e3accb98f0827677f546a61c0bc36d7d89907",
+    "botUserId": "32037361",
+    "botName": "𝑨́𝒕𝒊𝒍𝒂",
+    "deviceId": "e7a42524b5241eb9a73f28bc11b4f2ed",
+    "muteWords": [
+      "palavrao",
+      "xingamento",
+      "ofensa",
+      "lixo",
+      "trouxa",
+      "golpe",
+      "fake",
+      "teste_mute"
+    ],
+    "banWords": [
+      "pedofilia",
+      "menor",
+      "crime",
+      "droga",
+      "estelionato",
+      "pix falso"
+    ],
+    "recurringMessages": []
+  },
+  "active_creator": {
+    "userId": "26850812",
+    "sharedId": "35729338",
+    "name": "♡🌜LUA🌛♡",
+    "username": "luazinha",
+    "avatar": "https://cdn.sprlv-api.com/pp/26850812/33505cd567041df330929afa075752c1_b",
+    "diamonds": 1452791,
+    "followers": 224441,
+    "isLive": false,
+    "livestreamId": null,
+    "headline": "Live ao Vivo",
+    "lastSeen": "2026-09-27T00:19:55.720Z",
+    "liveFound": false,
+    "viewers": 0,
+    "is_modded": false
+  },
+  "recurring_messages": [
+    {
+      "id": "msg-rec-1",
+      "text": "✨ Bem-vindos à live! Siga o perfil da criadora para não perder transmissões exclusivas!",
+      "active": true,
+      "sendCount": 0,
+      "createdAt": "2026-09-26T22:06:26.030Z"
+    },
+    {
+      "id": "msg-rec-2",
+      "text": "🎁 Envie presentes para apoiarmos a transmissão e batermos a meta de hoje!",
+      "active": true,
+      "sendCount": 0,
+      "createdAt": "2026-09-26T22:06:26.030Z"
+    },
+    {
+      "id": "msg-rec-3",
+      "text": "📸 Acompanhe as novidades e bastidores também no Instagram! Compartilhe a live com os amigos!",
+      "active": true,
+      "sendCount": 0,
+      "createdAt": "2026-09-26T22:06:26.030Z"
+    }
+  ],
+  "moderation_rules": {
+    "muteWords": [
+      "palavrao",
+      "xingamento",
+      "ofensa",
+      "lixo",
+      "trouxa",
+      "golpe",
+      "fake",
+      "teste_mute"
+    ],
+    "banWords": [
+      "pedofilia",
+      "menor",
+      "crime",
+      "droga",
+      "estelionato",
+      "pix falso"
+    ],
+    "caseSensitive": false,
+    "exactMatch": false
+  },
+  "creators": {
+    "26850812": {
+      "userId": "26850812",
+      "sharedId": "35729338",
+      "name": "♡🌜LUA🌛♡",
+      "username": "luazinha",
+      "avatar": "https://cdn.sprlv-api.com/pp/26850812/33505cd567041df330929afa075752c1_b",
+      "diamonds": 1452791,
+      "followers": 224441,
+      "isLive": false,
+      "livestreamId": null,
+      "headline": "Live ao Vivo",
+      "lastSeen": "2026-09-27T00:19:55.720Z",
+      "liveFound": false,
+      "viewers": 0,
+      "is_modded": false
+    }
+  },
+  "audit_logs": [],
+  "system_logs": [
+    {
+      "id": "sys-1790468395717-0mj7",
+      "timestamp": "21:19:55",
+      "isoTime": "2026-09-27T00:19:55.717Z",
+      "category": "SYSTEM",
+      "level": "SUCCESS",
+      "message": "Perfil localizado: \"♡🌜LUA🌛♡\" (ID: 26850812, Shared: 35729338). Ao vivo: NÃO (Vigilante)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468386667-kg4e",
+      "timestamp": "21:19:46",
+      "isoTime": "2026-09-27T00:19:46.667Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468386062-kyrl",
+      "timestamp": "21:19:46",
+      "isoTime": "2026-09-27T00:19:46.062Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468384030-dhtq",
+      "timestamp": "21:19:44",
+      "isoTime": "2026-09-27T00:19:44.030Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1005, motivo: N/A). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468383877-pmqg",
+      "timestamp": "21:19:43",
+      "isoTime": "2026-09-27T00:19:43.877Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Token de autenticação inválido ou desconectado pelo SuperLive (invalid_auth). Alternando para conexão direta contínua via Device-ID...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468383871-5ccz",
+      "timestamp": "21:19:43",
+      "isoTime": "2026-09-27T00:19:43.871Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Autenticado)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468382983-adtx",
+      "timestamp": "21:19:42",
+      "isoTime": "2026-09-27T00:19:42.983Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Token)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468382146-5p1b",
+      "timestamp": "21:19:42",
+      "isoTime": "2026-09-27T00:19:42.175Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790466454363-fc2q",
+      "timestamp": "20:47:34",
+      "isoTime": "2026-09-26T23:47:34.363Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790466454325-tgsl",
+      "timestamp": "20:47:34",
+      "isoTime": "2026-09-26T23:47:34.325Z",
+      "category": "SYSTEM",
+      "level": "SUCCESS",
+      "message": "Perfil localizado: \"♡🌜LUA🌛♡\" (ID: 26850812, Shared: 35729338). Ao vivo: NÃO (Vigilante)",
+      "details": null
+    },
+    {
+      "id": "sys-1790466453743-uxfu",
+      "timestamp": "20:47:33",
+      "isoTime": "2026-09-26T23:47:33.743Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790466452906-5nre",
+      "timestamp": "20:47:32",
+      "isoTime": "2026-09-26T23:47:32.940Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790466436181-xmet",
+      "timestamp": "20:47:16",
+      "isoTime": "2026-09-26T23:47:16.181Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790466435555-2rg9",
+      "timestamp": "20:47:15",
+      "isoTime": "2026-09-26T23:47:15.555Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790466434719-rhq0",
+      "timestamp": "20:47:14",
+      "isoTime": "2026-09-26T23:47:14.746Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790466413608-qwbj",
+      "timestamp": "20:46:53",
+      "isoTime": "2026-09-26T23:46:53.608Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790466412974-moqf",
+      "timestamp": "20:46:52",
+      "isoTime": "2026-09-26T23:46:52.975Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790466412123-injp",
+      "timestamp": "20:46:52",
+      "isoTime": "2026-09-26T23:46:52.153Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790460507231-hyb2",
+      "timestamp": "19:08:27",
+      "isoTime": "2026-09-26T22:08:27.231Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790460506635-x5xi",
+      "timestamp": "19:08:26",
+      "isoTime": "2026-09-26T22:08:26.635Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790460504626-pjt7",
+      "timestamp": "19:08:24",
+      "isoTime": "2026-09-26T22:08:24.626Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1005, motivo: N/A). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790460502954-qwae",
+      "timestamp": "19:08:22",
+      "isoTime": "2026-09-26T22:08:22.954Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Token de autenticação inválido ou desconectado pelo SuperLive (invalid_auth). Alternando para conexão direta contínua via Device-ID...",
+      "details": null
+    },
+    {
+      "id": "sys-1790460502951-x77g",
+      "timestamp": "19:08:22",
+      "isoTime": "2026-09-26T22:08:22.951Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Autenticado)",
+      "details": null
+    },
+    {
+      "id": "sys-1790460502280-hzjb",
+      "timestamp": "19:08:22",
+      "isoTime": "2026-09-26T22:08:22.280Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Token)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790460501440-6n6o",
+      "timestamp": "19:08:21",
+      "isoTime": "2026-09-26T22:08:21.469Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790460475455-1nbx",
+      "timestamp": "19:07:55",
+      "isoTime": "2026-09-26T22:07:55.455Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790460474886-6403",
+      "timestamp": "19:07:54",
+      "isoTime": "2026-09-26T22:07:54.886Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790460472871-460z",
+      "timestamp": "19:07:52",
+      "isoTime": "2026-09-26T22:07:52.871Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1005, motivo: N/A). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790460472725-43au",
+      "timestamp": "19:07:52",
+      "isoTime": "2026-09-26T22:07:52.725Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Token de autenticação inválido ou desconectado pelo SuperLive (invalid_auth). Alternando para conexão direta contínua via Device-ID...",
+      "details": null
+    },
+    {
+      "id": "sys-1790460472719-o07u",
+      "timestamp": "19:07:52",
+      "isoTime": "2026-09-26T22:07:52.719Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Autenticado)",
+      "details": null
+    },
+    {
+      "id": "sys-1790460471899-tps6",
+      "timestamp": "19:07:51",
+      "isoTime": "2026-09-26T22:07:51.899Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Token)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790460471045-jrjn",
+      "timestamp": "19:07:51",
+      "isoTime": "2026-09-26T22:07:51.085Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    }
+  ],
+  "live_sessions": []
+}

@@ -11,6 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const botEngine = require('./bot_engine');
+const db = require('./db');
 
 function readJsonBody(req) {
   return new Promise((resolve) => {
@@ -175,8 +176,8 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // --- Bot Engine Management API Routes ---
-  if (pathname.startsWith('/api/bot/')) {
+  // --- Bot Engine & Mini-Database Management API Routes ---
+  if (pathname.startsWith('/api/bot/') || pathname.startsWith('/api/db/')) {
     setCorsHeaders(res);
     res.setHeader('Content-Type', 'application/json');
 
@@ -324,10 +325,56 @@ const server = http.createServer(async (req, res) => {
       }
 
       if (pathname === '/api/bot/clear-logs' && req.method === 'POST') {
+        db.clearAuditLogs();
         botEngine.moderationLogs = [];
         botEngine.chatFeed = [];
         res.writeHead(200);
         res.end(JSON.stringify({ success: true }));
+        return;
+      }
+
+      // --- Mini-Banco de Dados Persistente API Routes ---
+      if (pathname === '/api/db/data' && req.method === 'GET') {
+        res.writeHead(200);
+        res.end(JSON.stringify({
+          success: true,
+          config: db.getConfig(),
+          activeCreator: db.getActiveCreator(),
+          recurringMessages: db.getRecurringMessages(),
+          moderationRules: db.getModerationRules(),
+          auditLogs: db.getAuditLogs(100),
+          systemLogs: db.getSystemLogs(200),
+          liveSessions: db.getLiveSessions()
+        }));
+        return;
+      }
+
+      if (pathname === '/api/db/recurring/add' && req.method === 'POST') {
+        const body = await readJsonBody(req);
+        const item = db.addRecurringMessage(body.text);
+        botEngine.config = db.getConfig();
+        res.writeHead(200);
+        res.end(JSON.stringify({ success: true, item, messages: db.getRecurringMessages() }));
+        return;
+      }
+
+      if (pathname === '/api/db/recurring/delete' && req.method === 'POST') {
+        const body = await readJsonBody(req);
+        const removed = db.removeRecurringMessage(Number(body.index));
+        botEngine.config = db.getConfig();
+        res.writeHead(200);
+        res.end(JSON.stringify({ success: true, removed, messages: db.getRecurringMessages() }));
+        return;
+      }
+
+      if (pathname === '/api/db/recurring/reorder' && req.method === 'POST') {
+        const body = await readJsonBody(req);
+        if (Array.isArray(body.messages)) {
+          db.setRecurringMessagesFromStrings(body.messages);
+          botEngine.config = db.getConfig();
+        }
+        res.writeHead(200);
+        res.end(JSON.stringify({ success: true, messages: db.getRecurringMessages() }));
         return;
       }
 
