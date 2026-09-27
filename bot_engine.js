@@ -7,7 +7,10 @@
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
+let WebSocket = globalThis.WebSocket;
+if (!WebSocket) {
+  try { WebSocket = require('ws'); } catch (e) { WebSocket = null; }
+}
 const db = require('./db');
 
 const CONFIG_FILE = path.join(__dirname, 'bot_config.json');
@@ -37,10 +40,10 @@ const DEFAULT_CONFIG = {
   dmEnabled: true,
   dmTemplate: 'Live finalizada! Hoje você alcançou {viewers} espectadores e gerou {diamonds} diamantes na transmissão. Parabéns pelo show! ❤️',
   // Conta oficial do robô
-  botToken: '1a5e3accb98f0827677f546a61c0bc36d7d89907',
+  botToken: process.env.SUPERLIVE_BOT_TOKEN || '',
   botUserId: '32037361',
   botName: '𝑨́𝒕𝒊𝒍𝒂',
-  deviceId: 'e7a42524b5241eb9a73f28bc11b4f2ed'
+  deviceId: process.env.SUPERLIVE_DEVICE_ID || ''
 };
 
 class BotEngine {
@@ -49,6 +52,7 @@ class BotEngine {
     this.ws = null;
     this.wsConnected = false;
     this.authFailed = false;
+    this.authState = this.config.botToken ? 'unknown' : 'logged_out';
     this.reconnectTimer = null;
     this.heartbeatTimer = null;
     this.syncPollTimer = null;
@@ -75,8 +79,10 @@ class BotEngine {
     this.pendingResolutions = new Set();
 
     this.logSystem('SYSTEM', 'INFO', 'Engine Super Client iniciada com sucesso. Servidor operacional.');
-    // Conecta imediatamente ao WebSocket oficial para prontidão
-    setTimeout(() => this.connectWebSocket(), 800);
+    // Um token persistido precisa ser validado; não tratamos sua mera existência como login.
+    if (this.config.botToken) {
+      setTimeout(() => this.validateStoredToken(), 300);
+    }
   }
 
   // --- Resolução de Perfil de Usuário para Chat Real-Time ---
@@ -122,6 +128,7 @@ class BotEngine {
 
     if (newConfig && newConfig.botToken && newConfig.botToken !== previousToken) {
       this.authFailed = false;
+      this.authState = 'unknown';
       if (this.ws) {
         try { this.ws.close(); } catch (e) {}
       }
@@ -185,6 +192,49 @@ class BotEngine {
     });
   }
 
+  async registerDeviceId() {
+    const payload = JSON.stringify({
+      client_params: {
+        app_language: 'pt',
+        device_language: 'pt',
+        brand_name: 'Samsung',
+        display_density: 'xxhdpi',
+        display_size: '1080x2400',
+        device_preferred_languages: ['pt-BR', 'en-US']
+      }
+    });
+
+    return new Promise((resolve, reject) => {
+      const req = https.request({
+        hostname: REMOTE_API_HOST,
+        port: 443,
+        path: '/api/v1/device/register',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'User-Agent': 'SuperLive/2.31.0 (samsung SM-G998B; Android 13; Scale/3.0)',
+          'Content-Length': Buffer.byteLength(payload)
+        }
+      }, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed && parsed.guid) return resolve(String(parsed.guid));
+            reject(new Error(parsed?.error?.message || `device/register retornou HTTP ${res.statusCode}`));
+          } catch (e) {
+            reject(new Error(`Resposta inválida do device/register (HTTP ${res.statusCode})`));
+          }
+        });
+      });
+      req.on('error', reject);
+      req.write(payload);
+      req.end();
+    });
+  }
+
   // --- WebSocket Manager ---
   connectWebSocket() {
     // Conecta somente se estiver ativamente monitorando ou conectado a uma live
@@ -207,6 +257,11 @@ class BotEngine {
       : `${REMOTE_WS_HOST}?device=${this.config.deviceId}`;
 
     this.logSystem('WS', 'INFO', `Iniciando conexão WebSocket oficial (${hasValidToken ? 'Token' : 'Device-ID'})...`);
+
+    if (!WebSocket) {
+      this.logSystem('WS', 'ERROR', 'WebSocket indisponível neste Node. Instale as dependências com npm install.');
+      return;
+    }
 
     try {
       this.ws = new WebSocket(wsUrl);
@@ -235,9 +290,15 @@ class BotEngine {
         this.stopHeartbeat();
 
         if (evt.reason === 'duplicate_connection') {
-          this.config.deviceId = crypto.randomBytes(16).toString('hex');
-          db.saveConfig({ deviceId: this.config.deviceId });
-          this.logSystem('WS', 'INFO', `Conexão simultânea evitada. Novo Device-ID único gerado: ${this.config.deviceId}`);
+          // Um Device-ID aleatório não é necessariamente registrado pelo SuperLive.
+          // Registre um GUID oficial antes de tentar novamente.
+          this.registerDeviceId().then((guid) => {
+            if (guid) {
+              this.config.deviceId = guid;
+              db.saveConfig({ deviceId: guid });
+              this.logSystem('WS', 'INFO', `Conexão simultânea detectada. Novo Device-ID oficial registrado: ${guid}`);
+            }
+          }).catch(() => {});
         }
 
         // Se o token for inválido, não entra em loop de reconexão; o REST DualSync assume a captura
@@ -1255,6 +1316,71 @@ class BotEngine {
     return true;
   }
 
+  async validateStoredToken() {
+    if (!this.config.botToken) {
+      this.authState = 'logged_out';
+      return false;
+    }
+
+    try {
+      const payload = JSON.stringify({});
+      const profile = await new Promise((resolve, reject) => {
+        const req = https.request({
+          hostname: REMOTE_API_HOST,
+          port: 443,
+          path: '/api/v1/users/own_profile',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Accept': 'application/json',
+            'User-Agent': 'SuperLive/2.31.0 (samsung SM-G998B; Android 13; Scale/3.0)',
+            'Device-ID': this.config.deviceId,
+            'Authorization': `Token ${this.config.botToken}`,
+            'Content-Length': Buffer.byteLength(payload)
+          }
+        }, (res) => {
+          let data = '';
+          res.on('data', chunk => data += chunk);
+          res.on('end', () => {
+            try { resolve({ status: res.statusCode, data: JSON.parse(data) }); }
+            catch { resolve({ status: res.statusCode, data: null }); }
+          });
+        });
+        req.on('error', reject);
+        req.write(payload);
+        req.end();
+      });
+
+      const u = profile?.data?.user || profile?.data;
+      if (profile?.status >= 200 && profile?.status < 300 && u && (u.id || u.user_id || u.shared_id)) {
+        this.authFailed = false;
+        this.authState = 'valid';
+        if (u.id || u.user_id) this.config.botUserId = String(u.id || u.user_id);
+        if (u.name || u.shared_id) this.config.botName = u.name || u.shared_id;
+        db.saveConfig({ botUserId: this.config.botUserId, botName: this.config.botName });
+        this.logSystem('API', 'SUCCESS', `Token persistido validado com sucesso para ${this.config.botName}.`);
+        return true;
+      }
+
+      const code = profile?.data?.error?.code;
+      const status = profile?.status;
+      if (status === 401 || code === 2 || code === '2' || status === 403) {
+        this.authFailed = true;
+        this.authState = 'invalid';
+        this.logSystem('API', 'WARN', 'Token persistido rejeitado pelo SuperLive. Faça login novamente.');
+        return false;
+      }
+
+      this.authState = 'unknown';
+      return false;
+    } catch (e) {
+      // Falha de rede não invalida a sessão: apenas deixa seu estado como desconhecido.
+      this.authState = 'unknown';
+      this.logSystem('API', 'WARN', `Não foi possível validar a sessão agora: ${e.message}`);
+      return false;
+    }
+  }
+
   // --- Métodos Oficiais de Autenticação da Conta do Robô ---
   async loginWithEmail(email, password) {
     const cleanEmail = String(email || '').trim();
@@ -1387,6 +1513,7 @@ class BotEngine {
   async applyBotToken(token, userId, userData = null) {
     this.config.botToken = token;
     this.authFailed = false;
+    this.authState = 'valid';
 
     let userName = this.config.botName || 'Robô';
     let userSharedId = '';
@@ -1446,6 +1573,7 @@ class BotEngine {
   logoutBot() {
     this.config.botToken = '';
     this.authFailed = false;
+    this.authState = 'logged_out';
     this.saveConfig({
       botToken: ''
     }, false);
@@ -1460,11 +1588,12 @@ class BotEngine {
   // --- Estado Completo do Robô para o Portal ---
   getStatus() {
     const hasToken = !!this.config.botToken;
-    const isAuth = hasToken && !this.authFailed;
+    const isAuth = this.authState === 'valid' && hasToken && !this.authFailed;
     return {
       isMonitoring: this.isMonitoring,
       wsConnected: this.wsConnected,
       authFailed: !!this.authFailed,
+      authState: this.authState,
       isLoggedIn: isAuth,
       botAccount: {
         userId: this.config.botUserId,

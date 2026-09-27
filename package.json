@@ -15,5 +15,11 @@
     "ranking"
   ],
   "author": "Super Client Team",
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
 }

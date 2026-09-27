@@ -33,27 +33,12 @@ const DEFAULT_DB = {
     recurringCurrentIndex: 0,
     dmEnabled: true,
     dmTemplate: 'Live finalizada! Hoje você alcançou {viewers} espectadores e gerou {diamonds} diamantes na transmissão. Parabéns pelo show! ❤️',
-    botToken: '1a5e3accb98f0827677f546a61c0bc36d7d89907',
+    botToken: process.env.SUPERLIVE_BOT_TOKEN || '',
     botUserId: '32037361',
     botName: '𝑨́𝒕𝒊𝒍𝒂',
-    deviceId: 'e7a42524b5241eb9a73f28bc11b4f2ed'
+    deviceId: process.env.SUPERLIVE_DEVICE_ID || ''
   },
   active_creator: null,
-  creators: {
-    '35729338': {
-      userId: '26850812',
-      sharedId: '35729338',
-      name: '♡🌜LUA🌛♡',
-      username: 'luazinha',
-      avatar: 'https://cdn.sprlv-api.com/pp/26850812/33505cd567041df330929afa075752c1_b',
-      diamonds: 1452791,
-      followers: 224442,
-      isLive: false,
-      livestreamId: null,
-      headline: 'Live ao Vivo',
-      lastSeen: new Date().toISOString()
-    }
-  },
   recurring_messages: [
     {
       id: 'msg-rec-1',

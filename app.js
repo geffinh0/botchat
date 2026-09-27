@@ -20,18 +20,13 @@ function getApiBaseUrl() {
   return 'http://localhost:3000/api/v1/';
 }
 
-// Pre-set verified account token if none present so Gefferson's account connects immediately
-if (!localStorage.getItem('sc_auth_token')) {
-  localStorage.setItem('sc_auth_token', '1a5e3accb98f0827677f546a61c0bc36d7d89907');
-}
-
 // --- 1. Estado da Aplicação e Configurações ---
 const AppState = {
   activeTab: 'bot',
   isLoggedIn: false,
   apiHost: getApiBaseUrl(),
-  authToken: localStorage.getItem('sc_auth_token') || '1a5e3accb98f0827677f546a61c0bc36d7d89907',
-  deviceId: localStorage.getItem('sc_device_id') || 'e7a42524b5241eb9a73f28bc11b4f2ed',
+  authToken: localStorage.getItem('sc_auth_token') || '',
+  deviceId: localStorage.getItem('sc_device_id') || '',
   exchangeRate: 150, // Taxa real oficial da conta (150 diamantes = $1.00 USD)
   diamondsBalance: 0,
   monthlyDiamonds: 0,
@@ -1652,7 +1647,7 @@ function initBotModeratorModule() {
     recurringCurrentIndex: 0,
     dmEnabled: true,
     dmTemplate: 'Live finalizada! Hoje você alcançou {viewers} espectadores e gerou {diamonds} diamantes na transmissão. Parabéns pelo show! ❤️',
-    botToken: '1a5e3accb98f0827677f546a61c0bc36d7d89907',
+    botToken: '',
     botUserId: '32037361',
     botName: '𝑨́𝒕𝒊𝒍𝒂',
     deviceId: 'e7a42524b5241eb9a73f28bc11b4f2ed'
@@ -1969,7 +1964,7 @@ function initBotModeratorModule() {
       const sidebarSharedId = document.getElementById('sidebarSharedId');
       const btnLogoutBotModal = document.getElementById('btnLogoutBotModal');
 
-      const isBotLoggedIn = !!(data.isLoggedIn || (data.config && data.config.botToken && !data.authFailed));
+      const isBotLoggedIn = data.isLoggedIn === true && data.authFailed !== true;
       const botName = (data.config && data.config.botName) ? data.config.botName : 'Átila';
       const botUserId = (data.config && data.config.botUserId) ? data.config.botUserId : '32037361';
 

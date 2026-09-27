@@ -17,11 +17,18 @@ Sistema completo de Dashboard Web e Robô Moderador automatizado para transmiss�
 
 ## 🛠️ Como Rodar Localmente
 
+**Requisitos:** Node.js 20 ou superior.
+
 ```bash
 git clone https://github.com/geffinh0/botchat.git
 cd botchat
+npm install
 npm start
 ```
+
+O projeto declara `ws` como dependência porque o motor do robô usa WebSocket. Em Node 22+ há também fallback para o WebSocket nativo.
+
+A autenticação não usa mais token embutido no código do frontend. Faça login pelo painel ou configure `SUPERLIVE_BOT_TOKEN`/`SUPERLIVE_DEVICE_ID` como variáveis de ambiente quando quiser iniciar o servidor com uma sessão pré-configurada.
 
 Acesse no navegador: `http://localhost:3000`
 
