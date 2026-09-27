@@ -63,7 +63,7 @@
       </div>
 
       <div class="sidebar-footer">
-        <div class="account-pill" id="sidebarAccountPill" title="Conta oficial do Robô Moderador" style="cursor:default;">
+        <div class="account-pill" id="sidebarAccountPill" title="Clique para conectar ou gerenciar a conta do Robô" style="cursor:pointer;">
           <div class="user-avatar" id="sidebarAvatar" style="background: linear-gradient(135deg, #6366f1, #a855f7);">
             <span id="sidebarAvatarLetter">🤖</span>
             <div class="online-indicator active" id="sidebarOnlineIndicator"></div>
@@ -71,7 +71,7 @@
           <div class="account-details">
             <div class="account-name" id="sidebarUsername">𝑨́𝒕𝒊𝒍𝒂 (Robô Oficial)</div>
             <div class="account-meta" id="sidebarMeta">
-              <span>ID: <code style="color:#a5b4fc;">32037361</code></span>
+              <span>ID: <code id="sidebarSharedId" style="color:#a5b4fc;">32037361</code></span>
               <span class="badge-tag live-badge" style="font-size:9px; padding:1px 5px;">ATIVO</span>
             </div>
           </div>
@@ -127,10 +127,13 @@
                 </div>
               </div>
 
-              <div class="bot-header-actions">
-                <span style="font-size:12px; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
-                  🔒 Operação legítima com permissão de moderador concedida
+              <div class="bot-header-actions" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <span id="botAuthStatusPill" class="badge-tag" style="padding:5px 12px; font-weight:700; border-radius:6px; background:rgba(239,68,68,0.2); color:#f87171; border:1px solid rgba(239,68,68,0.4); cursor:pointer;" title="Clique para gerenciar a conta do robô">
+                  ⚠️ NÃO LOGADO (Clique para Login)
                 </span>
+                <button class="btn btn-primary" id="btnOpenBotLoginModal" title="Fazer login com email e senha da conta do robô">
+                  <span>🔑 Login do Robô</span>
+                </button>
               </div>
             </div>
 
@@ -670,6 +673,153 @@
       </div>
     </div>
   </aside>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Modal de Login / Conexão de Conta do Robô -->
+  <div class="modal-backdrop" id="loginModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:24px;">🔑</span>
+          <div>
+            <h3 style="margin:0; font-size:18px; font-weight:800;">Conta do Robô Moderador</h3>
+            <span style="font-size:12px; color:var(--text-secondary);">SuperLive — Login Oficial para Moderação e Envio de Mensagens</span>
+          </div>
+        </div>
+        <button class="close-btn" id="btnCloseLoginModal" title="Fechar">&times;</button>
+      </div>
+
+      <!-- Abas de Conexão -->
+      <div class="modal-tabs">
+        <button class="modal-tab-btn active" id="tabBtnEmail">📧 Email &amp; Senha</button>
+        <button class="modal-tab-btn" id="tabBtnPhone">📱 Celular (SMS)</button>
+        <button class="modal-tab-btn" id="tabBtnToken">⚡ Token Direto</button>
+        <button class="modal-tab-btn" id="tabBtnHelp">❓ Ajuda</button>
+      </div>
+
+      <!-- Aba 1: Email e Senha -->
+      <div class="modal-tab-pane active" id="tabPaneEmail">
+        <div class="alert-box" id="loginAlertBox" style="display:none; padding:10px 14px; border-radius:8px; font-size:12px;"></div>
+
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="font-size:12px; font-weight:600; color:var(--text-secondary);">Email registrado no SuperLive:</label>
+          <input type="email" id="loginEmail" class="custom-input" placeholder="seu-email@exemplo.com" value="" />
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="font-size:12px; font-weight:600; color:var(--text-secondary);">Senha do SuperLive:</label>
+          <div class="password-input-wrapper">
+            <input type="password" id="loginPassword" class="custom-input" placeholder="••••••••" style="width:100%; padding-right:40px;" />
+            <button class="password-toggle-btn" id="btnTogglePassword" type="button" title="Ver / Ocultar Senha">👁️</button>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+          <button class="btn btn-primary" id="btnSubmitEmailLogin" style="flex:1; justify-content:center; padding:12px;">
+            <span id="loginSubmitText">⚡ Entrar na Conta do Robô</span>
+          </button>
+          <button class="btn btn-secondary" id="btnLogoutBotModal" style="padding:12px 14px; color:#f87171; border-color:rgba(239,68,68,0.3); display:none;" title="Desconectar conta atual">
+            <span>Sair</span>
+          </button>
+        </div>
+
+        <div style="font-size:11px; color:var(--text-muted); text-align:center; margin-top:4px;">
+          🔒 O Super Client conecta diretamente com os servidores oficiais do SuperLive. Suas credenciais permanecem salvas apenas no seu servidor local.
+        </div>
+      </div>
+
+      <!-- Aba 2: Login por Telefone (SMS) -->
+      <div class="modal-tab-pane" id="tabPanePhone">
+        <!-- Passo 1: Informar Telefone -->
+        <div id="phoneStep1" style="display:flex; flex-direction:column; gap:16px;">
+          <div class="alert-box" id="phoneAlertBox" style="display:none; padding:10px 14px; border-radius:8px; font-size:12px;"></div>
+
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <label style="font-size:12px; font-weight:600; color:var(--text-secondary);">Número de Celular com DDD:</label>
+            <div style="display:flex; gap:8px;">
+              <select id="loginPhoneCountryCode" class="custom-input" style="width:105px; flex-shrink:0;">
+                <option value="+55" selected>🇧🇷 +55</option>
+                <option value="+1">🇺🇸 +1</option>
+                <option value="+351">🇵🇹 +351</option>
+                <option value="+34">🇪🇸 +34</option>
+                <option value="+44">🇬🇧 +44</option>
+                <option value="+54">🇦🇷 +54</option>
+              </select>
+              <input type="tel" id="loginPhoneNumber" class="custom-input" placeholder="(11) 98765-4321" style="flex:1;" />
+            </div>
+            <span style="font-size:11px; color:var(--text-muted);">Informe o celular da conta SuperLive para receber o código SMS.</span>
+          </div>
+
+          <button class="btn btn-primary" id="btnSendPhoneCode" style="justify-content:center; padding:12px;">
+            <span id="btnSendPhoneCodeText">📲 Enviar Código por SMS</span>
+          </button>
+        </div>
+
+        <!-- Passo 2: Digitar Código SMS -->
+        <div id="phoneStep2" style="display:none; flex-direction:column; gap:16px;">
+          <div class="alert-box" id="phoneVerifyAlertBox" style="display:none; padding:10px 14px; border-radius:8px; font-size:12px;"></div>
+
+          <div style="background:rgba(255,255,255,0.04); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px; text-align:center;">
+            <span style="font-size:12px; color:var(--text-secondary);">Código enviado para:</span>
+            <div id="phoneTargetDisplay" style="font-size:15px; font-weight:700; color:var(--accent); margin-top:2px;"></div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <label style="font-size:12px; font-weight:600; color:var(--text-secondary);">Código SMS recebido (6 dígitos):</label>
+            <input type="text" id="loginSmsCode" class="custom-input" placeholder="123456" maxlength="6" style="font-size:22px; font-weight:800; letter-spacing:8px; text-align:center;" />
+          </div>
+
+          <button class="btn btn-primary" id="btnSubmitPhoneCode" style="justify-content:center; padding:12px;">
+            <span id="btnSubmitPhoneCodeText">⚡ Confirmar Código e Conectar</span>
+          </button>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+            <button class="btn-text" id="btnBackToPhoneInput" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; text-decoration:underline;">← Trocar Número</button>
+            <button class="btn-text" id="btnResendPhoneCode" style="background:none; border:none; color:var(--accent); cursor:pointer;" disabled>
+              Reenviar SMS <span id="phoneResendCountdown"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aba 3: Token Direto -->
+      <div class="modal-tab-pane" id="tabPaneToken">
+        <div class="alert-box" id="tokenAlertBox" style="display:none; padding:10px 14px; border-radius:8px; font-size:12px;"></div>
+
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="font-size:12px; font-weight:600; color:var(--text-secondary);">Token de Acesso (SuperLive Token):</label>
+          <input type="text" id="directTokenInput" class="custom-input" placeholder="Cole aqui seu Token (ex: 1a5e3accb...)" style="font-family:var(--font-mono); font-size:12px;" />
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label style="font-size:12px; font-weight:600; color:var(--text-secondary);">Device-ID:</label>
+            <button class="btn-text" id="btnRegisterNewGuidModal" style="background:none; border:none; color:var(--accent); font-size:11px; cursor:pointer; text-decoration:underline;">🔄 Gerar Novo</button>
+          </div>
+          <input type="text" id="directDeviceIdInput" class="custom-input" placeholder="Device ID (32 caracteres hex)" style="font-family:var(--font-mono); font-size:12px;" />
+        </div>
+
+        <button class="btn btn-primary" id="btnSubmitTokenLogin" style="justify-content:center; padding:12px;">
+          <span>⚡ Conectar com Este Token</span>
+        </button>
+      </div>
+
+      <!-- Aba 4: Ajuda -->
+      <div class="modal-tab-pane" id="tabPaneHelp">
+        <div style="font-size:13px; line-height:1.6; color:var(--text-secondary); display:flex; flex-direction:column; gap:10px;">
+          <p><strong>Como funciona a autenticação do Robô:</strong></p>
+          <p>1. <strong>Email e Senha:</strong> Coloque as mesmas credenciais que usa no app SuperLive no celular para a conta que atuará como Moderadora.</p>
+          <p>2. <strong>Por que fazer Login?</strong> Estando logado, o robô pode visualizar lives privadas/sub-rooms, enviar avisos automáticos e aplicar regras de moderação (silenciar ou banir).</p>
+          <p>3. <strong>Papel de Moderador:</strong> A criadora da live precisa adicionar este usuário como <em>Moderador</em> da transmissão para que as ações de moderação sejam aceitas pelo SuperLive.</p>
+        </div>
+        <button class="btn btn-secondary" id="btnGoBackToLogin" style="justify-content:center; margin-top:8px;">
+          <span>Voltar para o Login</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script src="app.js?v=2.32.0"></script>
 </body>

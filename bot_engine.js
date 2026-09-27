@@ -138,7 +138,7 @@ class BotEngine {
   apiRequest(apiPath, body = {}, forceNoToken = false) {
     return new Promise((resolve, reject) => {
       const payload = JSON.stringify(body);
-      const isPublicPath = ['users/search', 'users/profile', 'livestream/retrieve'].includes(apiPath);
+      const isAuthExempt = apiPath.startsWith('user/signup/');
       const headers = {
         'Content-Type': 'application/json; charset=UTF-8',
         'Accept': 'application/json',
@@ -147,7 +147,7 @@ class BotEngine {
         'Content-Length': Buffer.byteLength(payload)
       };
 
-      if (this.config.botToken && !this.authFailed && !forceNoToken && !isPublicPath) {
+      if (this.config.botToken && !this.authFailed && !forceNoToken && !isAuthExempt) {
         headers['Authorization'] = `Token ${this.config.botToken}`;
       }
 
@@ -1255,12 +1255,223 @@ class BotEngine {
     return true;
   }
 
+  // --- Métodos Oficiais de Autenticação da Conta do Robô ---
+  async loginWithEmail(email, password) {
+    const cleanEmail = String(email || '').trim();
+    if (!cleanEmail || !password) {
+      return { success: false, error: 'Email e senha são obrigatórios.' };
+    }
+
+    this.logSystem('API', 'INFO', `Iniciando autenticação oficial no SuperLive para o robô: ${cleanEmail}...`);
+    try {
+      const res = await this.apiRequest('user/signup/email_signin', {
+        email: cleanEmail,
+        password: String(password)
+      }, true);
+
+      if (res && res.token) {
+        return await this.applyBotToken(res.token, res.user_id || (res.user && res.user.id), res.user);
+      }
+
+      const errMsg = res?.error?.message || 'Email ou senha incorretos.';
+      this.logSystem('API', 'ERROR', `Falha no login do robô via Email: ${errMsg}`);
+      return { success: false, error: errMsg };
+    } catch (e) {
+      this.logSystem('API', 'ERROR', `Erro de conexão ao autenticar robô: ${e.message}`);
+      return { success: false, error: e.message };
+    }
+  }
+
+  async loginWithToken(token, deviceId = null) {
+    if (!token) return { success: false, error: 'Token de autenticação não informado.' };
+    const cleanToken = String(token).trim();
+
+    if (deviceId && String(deviceId).trim()) {
+      this.config.deviceId = String(deviceId).trim();
+      db.saveConfig({ deviceId: this.config.deviceId });
+    }
+
+    this.logSystem('API', 'INFO', `Validando token de acesso oficial do robô...`);
+    try {
+      const payload = JSON.stringify({});
+      const profile = await new Promise((resolve, reject) => {
+        const req = https.request({
+          hostname: REMOTE_API_HOST,
+          port: 443,
+          path: '/api/v1/users/own_profile',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Accept': 'application/json',
+            'User-Agent': 'SuperLive/2.31.0 (samsung SM-G998B; Android 13; Scale/3.0)',
+            'Device-ID': this.config.deviceId,
+            'Authorization': `Token ${cleanToken}`,
+            'Content-Length': Buffer.byteLength(payload)
+          }
+        }, (res) => {
+          let data = '';
+          res.on('data', chunk => data += chunk);
+          res.on('end', () => {
+            try {
+              resolve(JSON.parse(data));
+            } catch (e) {
+              resolve(null);
+            }
+          });
+        });
+        req.on('error', reject);
+        req.write(payload);
+        req.end();
+      });
+
+      if (profile && (profile.user || profile.id || profile.shared_id)) {
+        const u = profile.user || profile;
+        return await this.applyBotToken(cleanToken, u.id || u.user_id, u);
+      } else {
+        const msg = profile?.error?.message || 'Token rejeitado pelo SuperLive. Verifique o valor e o Device-ID.';
+        this.logSystem('API', 'WARN', `Token rejeitado: ${msg}`);
+        return { success: false, error: msg };
+      }
+    } catch (e) {
+      return { success: false, error: e.message };
+    }
+  }
+
+  async sendPhoneCode(phoneNumber, isRetry = false) {
+    const rawNumber = String(phoneNumber || '').trim();
+    if (!rawNumber) return { success: false, error: 'Número de telefone obrigatório.' };
+
+    this.logSystem('API', 'INFO', `Solicitando código de SMS SuperLive para ${rawNumber}...`);
+    try {
+      const res = await this.apiRequest('user/signup/send_phone_verification_code', {
+        phone_number: rawNumber,
+        is_retry: !!isRetry
+      }, true);
+
+      if (res && res.phone_verification_id) {
+        return {
+          success: true,
+          phone_verification_id: res.phone_verification_id,
+          retry_timeout_seconds: res.retry_timeout_seconds || 60
+        };
+      }
+      return { success: false, error: res?.error?.message || 'Falha ao solicitar SMS ao SuperLive.' };
+    } catch (e) {
+      return { success: false, error: e.message };
+    }
+  }
+
+  async verifyPhoneCode(phoneVerificationId, phoneNumber, code) {
+    const cleanCode = String(code || '').replace(/\D/g, '').trim();
+    if (!cleanCode || cleanCode.length < 4) {
+      return { success: false, error: 'Código de SMS inválido.' };
+    }
+
+    this.logSystem('API', 'INFO', `Validando código SMS com SuperLive...`);
+    try {
+      const res = await this.apiRequest('user/signup/auth_phone', {
+        phone_verification_id: phoneVerificationId,
+        phone_number: phoneNumber,
+        code: cleanCode
+      }, true);
+
+      if (res && res.token) {
+        return await this.applyBotToken(res.token, res.user_id || (res.user && res.user.id), res.user);
+      }
+      return { success: false, error: res?.error?.message || 'Código SMS incorreto ou expirado.' };
+    } catch (e) {
+      return { success: false, error: e.message };
+    }
+  }
+
+  async applyBotToken(token, userId, userData = null) {
+    this.config.botToken = token;
+    this.authFailed = false;
+
+    let userName = this.config.botName || 'Robô';
+    let userSharedId = '';
+    let avatarUrl = '';
+
+    if (userData) {
+      userName = userData.name || userData.shared_id || userName;
+      userSharedId = userData.shared_id || '';
+      avatarUrl = (userData.profile_images && userData.profile_images[0] ? userData.profile_images[0].url : (userData.profile_image ? userData.profile_image.url : '')) || '';
+    } else {
+      try {
+        const pRes = await this.apiRequest('users/own_profile', {});
+        if (pRes && (pRes.user || pRes.id)) {
+          const u = pRes.user || pRes;
+          userName = u.name || u.shared_id || userName;
+          userId = u.id || u.user_id || userId;
+          userSharedId = u.shared_id || '';
+          avatarUrl = (u.profile_images && u.profile_images[0] ? u.profile_images[0].url : (u.profile_image ? u.profile_image.url : '')) || '';
+        }
+      } catch (e) {}
+    }
+
+    if (userId) this.config.botUserId = String(userId);
+    this.config.botName = userName;
+
+    // Salva na persistência
+    this.saveConfig({
+      botToken: this.config.botToken,
+      botUserId: this.config.botUserId,
+      botName: this.config.botName,
+      deviceId: this.config.deviceId
+    }, false);
+
+    this.logSystem('SYSTEM', 'SUCCESS', `Conta do robô autenticada com sucesso: "${userName}" (ID: ${this.config.botUserId}, Shared: ${userSharedId || 'N/A'})`);
+
+    // Reconecta WebSocket com credenciais válidas se ativo
+    if (this.ws) {
+      try { this.ws.close(); } catch (e) {}
+    }
+    if (this.isMonitoring || this.activeLive) {
+      setTimeout(() => this.connectWebSocket(), 300);
+    }
+
+    return {
+      success: true,
+      token: this.config.botToken,
+      user: {
+        id: this.config.botUserId,
+        userId: this.config.botUserId,
+        name: this.config.botName,
+        sharedId: userSharedId,
+        avatar: avatarUrl
+      }
+    };
+  }
+
+  logoutBot() {
+    this.config.botToken = '';
+    this.authFailed = false;
+    this.saveConfig({
+      botToken: ''
+    }, false);
+
+    if (this.ws) {
+      try { this.ws.close(); } catch (e) {}
+    }
+    this.logSystem('SYSTEM', 'INFO', 'Conta do robô desconectada (logout efetuado).');
+    return { success: true };
+  }
+
   // --- Estado Completo do Robô para o Portal ---
   getStatus() {
+    const hasToken = !!this.config.botToken;
+    const isAuth = hasToken && !this.authFailed;
     return {
       isMonitoring: this.isMonitoring,
       wsConnected: this.wsConnected,
       authFailed: !!this.authFailed,
+      isLoggedIn: isAuth,
+      botAccount: {
+        userId: this.config.botUserId,
+        name: this.config.botName,
+        hasToken: hasToken,
+        isAuth: isAuth
+      },
       dualSyncActive: !!this.syncPollTimer,
       activeLive: this.activeLive,
       activeCreator: db.getActiveCreator(),

@@ -61,6 +61,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   clearStaleServiceWorkerAndCaches();
   initNavigation();
   initToasts();
+  initLoginModal();
+  initCopyUserId();
   initBotModeratorModule();
   initCornerLiveWidget();
   initSystemLogsModule();
@@ -241,36 +243,53 @@ async function handleEmailLogin(email, password) {
   const btn = document.getElementById('btnSubmitEmailLogin');
   const btnText = document.getElementById('loginSubmitText');
 
-  alertBox.style.display = 'none';
-  btn.disabled = true;
-  btnText.innerHTML = '<span class="spinning">🔄</span> Autenticando no SuperLive...';
+  if (alertBox) alertBox.style.display = 'none';
+  if (btn) btn.disabled = true;
+  if (btnText) btnText.innerHTML = '<span class="spinning">🔄</span> Autenticando com SuperLive...';
 
-  const res = await apiCall('user/signup/email_signin', 'POST', {
-    email,
-    password
-  });
+  try {
+    const res = await fetch('/api/bot/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'email', email: email.trim(), password: password })
+    });
+    const data = await res.json();
 
-  btn.disabled = false;
-  btnText.textContent = '⚡ Entrar na Minha Conta';
+    if (btn) btn.disabled = false;
+    if (btnText) btnText.textContent = '⚡ Entrar na Conta do Robô';
 
-  if (res.ok && res.data && res.data.token) {
-    const token = res.data.token;
-    AppState.authToken = token;
-    localStorage.setItem('sc_auth_token', token);
+    if (data && data.success && data.token) {
+      AppState.authToken = data.token;
+      AppState.isLoggedIn = true;
+      localStorage.setItem('sc_auth_token', data.token);
 
-    closeLoginModal();
-    showToast('Login realizado com sucesso no SuperLive!', 'success');
-    await validateAndLoadAccount();
-  } else {
-    alertBox.style.display = 'block';
-    alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
-    alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
-    alertBox.style.color = '#fca5a5';
+      const name = data.user?.name || 'Robô';
+      closeLoginModal();
+      showToast(`Conta do Robô conectada: "${name}"!`, 'success');
 
-    if (res.status === 0) {
-      alertBox.textContent = 'Não foi possível conectar ao servidor local (http://localhost:3000). Certifique-se de que o servidor node server.js está rodando.';
+      if (window.triggerBotStatusRefresh) {
+        window.triggerBotStatusRefresh();
+      }
+      await validateAndLoadAccount();
     } else {
-      alertBox.textContent = res.data?.error?.message || 'Credenciais inválidas ou erro no servidor SuperLive.';
+      const errMsg = data?.error || 'Email ou senha incorretos no SuperLive.';
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+        alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+        alertBox.style.color = '#fca5a5';
+        alertBox.textContent = errMsg;
+      }
+    }
+  } catch (err) {
+    if (btn) btn.disabled = false;
+    if (btnText) btnText.textContent = '⚡ Entrar na Conta do Robô';
+    if (alertBox) {
+      alertBox.style.display = 'block';
+      alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+      alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+      alertBox.style.color = '#fca5a5';
+      alertBox.textContent = 'Erro ao comunicar com o servidor: ' + err.message;
     }
   }
 }
@@ -279,32 +298,78 @@ async function handleTokenLogin(token, deviceId) {
   const alertBox = document.getElementById('tokenAlertBox');
   const btn = document.getElementById('btnSubmitTokenLogin');
 
-  alertBox.style.display = 'none';
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinning">🔄</span> Validando Token...';
-
-  AppState.authToken = token.trim();
-  if (deviceId) {
-    AppState.deviceId = deviceId.trim();
-    localStorage.setItem('sc_device_id', AppState.deviceId);
+  if (alertBox) alertBox.style.display = 'none';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinning">🔄</span> Validando Token...';
   }
 
-  const res = await apiCall('users/own_profile', 'POST', {});
+  try {
+    const res = await fetch('/api/bot/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'token', token: token.trim(), deviceId: deviceId ? deviceId.trim() : null })
+    });
+    const data = await res.json();
 
-  btn.disabled = false;
-  btn.innerHTML = '<span>⚡ Conectar com Este Token</span>';
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<span>⚡ Conectar com Este Token</span>';
+    }
 
-  if (res.ok && res.data) {
-    localStorage.setItem('sc_auth_token', AppState.authToken);
+    if (data && data.success && data.token) {
+      AppState.authToken = data.token;
+      AppState.isLoggedIn = true;
+      localStorage.setItem('sc_auth_token', data.token);
+
+      const name = data.user?.name || 'Robô';
+      closeLoginModal();
+      showToast(`Conta do Robô conectada via Token: "${name}"!`, 'success');
+
+      if (window.triggerBotStatusRefresh) {
+        window.triggerBotStatusRefresh();
+      }
+      await validateAndLoadAccount();
+    } else {
+      const errMsg = data?.error || 'Token rejeitado pelo SuperLive. Verifique o valor e o Device-ID.';
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+        alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+        alertBox.style.color = '#fca5a5';
+        alertBox.textContent = errMsg;
+      }
+    }
+  } catch (err) {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<span>⚡ Conectar com Este Token</span>';
+    }
+    if (alertBox) {
+      alertBox.style.display = 'block';
+      alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+      alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+      alertBox.style.color = '#fca5a5';
+      alertBox.textContent = 'Erro ao validar token: ' + err.message;
+    }
+  }
+}
+
+async function handleBotLogout() {
+  try {
+    await fetch('/api/bot/logout', { method: 'POST' });
+    AppState.authToken = '';
+    AppState.isLoggedIn = false;
+    localStorage.removeItem('sc_auth_token');
+
     closeLoginModal();
-    showToast('Conta conectada com sucesso via Token!', 'success');
-    await validateAndLoadAccount();
-  } else {
-    alertBox.style.display = 'block';
-    alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
-    alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
-    alertBox.style.color = '#fca5a5';
-    alertBox.textContent = res.data?.error?.message || 'Token rejeitado pelo SuperLive. Verifique o valor e o Device-ID.';
+    showToast('Conta do robô desconectada com sucesso.', 'info');
+
+    if (window.triggerBotStatusRefresh) {
+      window.triggerBotStatusRefresh();
+    }
+  } catch (e) {
+    showToast('Erro ao desconectar conta: ' + e.message, 'error');
   }
 }
 
@@ -315,115 +380,158 @@ let phoneResendCountdown = null;
 let phoneCountdownSeconds = 0;
 
 async function handleSendPhoneCode(isRetry = false) {
-  const countryCode = document.getElementById('loginPhoneCountryCode').value;
-  const rawNumber = document.getElementById('loginPhoneNumber').value.trim();
+  const countryCode = document.getElementById('loginPhoneCountryCode')?.value || '+55';
+  const rawNumber = document.getElementById('loginPhoneNumber')?.value.trim() || '';
   const alertBox = document.getElementById('phoneAlertBox');
   const btn = document.getElementById('btnSendPhoneCode');
   const btnText = document.getElementById('btnSendPhoneCodeText');
 
-  alertBox.style.display = 'none';
+  if (alertBox) alertBox.style.display = 'none';
 
   const cleanDigits = rawNumber.replace(/\D/g, '');
   if (!cleanDigits || cleanDigits.length < 8) {
-    alertBox.style.display = 'block';
-    alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
-    alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
-    alertBox.style.color = '#fca5a5';
-    alertBox.textContent = 'Por favor, informe um número de telefone celular válido com DDD (pelo menos 8 dígitos).';
+    if (alertBox) {
+      alertBox.style.display = 'block';
+      alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+      alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+      alertBox.style.color = '#fca5a5';
+      alertBox.textContent = 'Por favor, informe um número de telefone celular válido com DDD.';
+    }
     return;
   }
 
   const fullPhoneNumber = `${countryCode}${cleanDigits}`;
   currentPhoneNumber = fullPhoneNumber;
 
-  btn.disabled = true;
-  btnText.innerHTML = '<span class="spinning">🔄</span> Solicitando SMS ao SuperLive...';
+  if (btn) btn.disabled = true;
+  if (btnText) btnText.innerHTML = '<span class="spinning">🔄</span> Solicitando SMS ao SuperLive...';
 
-  const res = await apiCall('user/signup/send_phone_verification_code', 'POST', {
-    phone_number: fullPhoneNumber,
-    is_retry: isRetry
-  });
+  try {
+    const res = await fetch('/api/bot/send-phone-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone_number: fullPhoneNumber, is_retry: isRetry })
+    });
+    const data = await res.json();
 
-  btn.disabled = false;
-  btnText.textContent = '📲 Enviar Código por SMS';
+    if (btn) btn.disabled = false;
+    if (btnText) btnText.textContent = '📲 Enviar Código por SMS';
 
-  if (res.ok && res.data && res.data.phone_verification_id) {
-    currentPhoneVerificationId = res.data.phone_verification_id;
+    if (data && data.success && data.phone_verification_id) {
+      currentPhoneVerificationId = data.phone_verification_id;
 
-    // Alternar para o Passo 2 (Entrada do Código SMS)
-    document.getElementById('phoneStep1').style.display = 'none';
-    const step2 = document.getElementById('phoneStep2');
-    step2.style.display = 'flex';
+      const p1 = document.getElementById('phoneStep1');
+      const p2 = document.getElementById('phoneStep2');
+      if (p1) p1.style.display = 'none';
+      if (p2) p2.style.display = 'flex';
 
-    // Formatar exibição do número para o usuário
-    const displayEl = document.getElementById('phoneTargetDisplay');
-    displayEl.textContent = formatPhoneDisplay(countryCode, cleanDigits);
+      const displayEl = document.getElementById('phoneTargetDisplay');
+      if (displayEl) displayEl.textContent = formatPhoneDisplay(countryCode, cleanDigits);
 
-    // Limpar e focar campo de SMS
-    const codeInput = document.getElementById('loginSmsCode');
-    codeInput.value = '';
-    codeInput.focus();
-    document.getElementById('phoneVerifyAlertBox').style.display = 'none';
+      const codeInput = document.getElementById('loginSmsCode');
+      if (codeInput) {
+        codeInput.value = '';
+        codeInput.focus();
+      }
+      const pvAlert = document.getElementById('phoneVerifyAlertBox');
+      if (pvAlert) pvAlert.style.display = 'none';
 
-    // Iniciar contagem para reenvio
-    startPhoneResendTimer(res.data.retry_timeout_seconds || 60);
-
-    showToast('Código SMS enviado com sucesso para o seu celular!', 'success');
-  } else {
-    alertBox.style.display = 'block';
-    alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
-    alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
-    alertBox.style.color = '#fca5a5';
-    alertBox.textContent = res.data?.error?.message || 'Falha ao solicitar SMS. Verifique o número e tente novamente.';
+      startPhoneResendTimer(data.retry_timeout_seconds || 60);
+      showToast('Código SMS enviado com sucesso para o seu celular!', 'success');
+    } else {
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+        alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+        alertBox.style.color = '#fca5a5';
+        alertBox.textContent = data?.error || 'Falha ao solicitar SMS. Verifique o número e tente novamente.';
+      }
+    }
+  } catch (err) {
+    if (btn) btn.disabled = false;
+    if (btnText) btnText.textContent = '📲 Enviar Código por SMS';
+    if (alertBox) {
+      alertBox.style.display = 'block';
+      alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+      alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+      alertBox.style.color = '#fca5a5';
+      alertBox.textContent = 'Erro ao solicitar SMS: ' + err.message;
+    }
   }
 }
 
 async function handleVerifyPhoneCode() {
   const codeInput = document.getElementById('loginSmsCode');
-  const code = codeInput.value.replace(/\D/g, '').trim();
+  const code = codeInput ? codeInput.value.replace(/\D/g, '').trim() : '';
   const alertBox = document.getElementById('phoneVerifyAlertBox');
   const btn = document.getElementById('btnSubmitPhoneCode');
   const btnText = document.getElementById('btnSubmitPhoneCodeText');
 
-  alertBox.style.display = 'none';
+  if (alertBox) alertBox.style.display = 'none';
 
   if (!code || code.length < 4) {
-    alertBox.style.display = 'block';
-    alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
-    alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
-    alertBox.style.color = '#fca5a5';
-    alertBox.textContent = 'Por favor, digite o código de verificação recebido por SMS.';
+    if (alertBox) {
+      alertBox.style.display = 'block';
+      alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+      alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+      alertBox.style.color = '#fca5a5';
+      alertBox.textContent = 'Por favor, digite o código de verificação recebido por SMS.';
+    }
     return;
   }
 
-  btn.disabled = true;
-  btnText.innerHTML = '<span class="spinning">🔄</span> Validando Código SMS...';
+  if (btn) btn.disabled = true;
+  if (btnText) btnText.innerHTML = '<span class="spinning">🔄</span> Validando Código SMS...';
 
-  const res = await apiCall('user/signup/auth_phone', 'POST', {
-    phone_verification_id: currentPhoneVerificationId,
-    phone_number: currentPhoneNumber,
-    code: code
-  });
+  try {
+    const res = await fetch('/api/bot/verify-phone-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        phone_verification_id: currentPhoneVerificationId,
+        phone_number: currentPhoneNumber,
+        code: code
+      })
+    });
+    const data = await res.json();
 
-  btn.disabled = false;
-  btnText.textContent = '⚡ Confirmar Código e Entrar';
+    if (btn) btn.disabled = false;
+    if (btnText) btnText.textContent = '⚡ Confirmar Código e Conectar';
 
-  if (res.ok && res.data && res.data.token) {
-    const token = res.data.token;
-    AppState.authToken = token;
-    localStorage.setItem('sc_auth_token', token);
+    if (data && data.success && data.token) {
+      AppState.authToken = data.token;
+      AppState.isLoggedIn = true;
+      localStorage.setItem('sc_auth_token', data.token);
 
-    if (phoneResendCountdown) clearInterval(phoneResendCountdown);
+      if (phoneResendCountdown) clearInterval(phoneResendCountdown);
 
-    closeLoginModal();
-    showToast('Login com Telefone realizado com sucesso!', 'success');
-    await validateAndLoadAccount();
-  } else {
-    alertBox.style.display = 'block';
-    alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
-    alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
-    alertBox.style.color = '#fca5a5';
-    alertBox.textContent = res.data?.error?.message || 'Código de verificação incorreto ou expirado. Tente novamente.';
+      const name = data.user?.name || 'Robô';
+      closeLoginModal();
+      showToast(`Login com celular realizado: "${name}"!`, 'success');
+
+      if (window.triggerBotStatusRefresh) {
+        window.triggerBotStatusRefresh();
+      }
+      await validateAndLoadAccount();
+    } else {
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+        alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+        alertBox.style.color = '#fca5a5';
+        alertBox.textContent = data?.error || 'Código incorreto ou expirado. Tente novamente.';
+      }
+    }
+  } catch (err) {
+    if (btn) btn.disabled = false;
+    if (btnText) btnText.textContent = '⚡ Confirmar Código e Conectar';
+    if (alertBox) {
+      alertBox.style.display = 'block';
+      alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+      alertBox.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+      alertBox.style.color = '#fca5a5';
+      alertBox.textContent = 'Erro ao validar código SMS: ' + err.message;
+    }
   }
 }
 
@@ -1250,18 +1358,30 @@ function initLoginModal() {
   const btnClose = document.getElementById('btnCloseLoginModal');
   const btnAccountAction = document.getElementById('btnAccountAction');
   const sidebarAccountPill = document.getElementById('sidebarAccountPill');
+  const btnOpenBotLoginModal = document.getElementById('btnOpenBotLoginModal');
+  const botAuthStatusPill = document.getElementById('botAuthStatusPill');
+  const btnLogoutBotModal = document.getElementById('btnLogoutBotModal');
 
   window.openLoginModal = () => {
-    modal.classList.add('active');
+    if (modal) modal.classList.add('active');
   };
 
   window.closeLoginModal = () => {
-    modal.classList.remove('active');
+    if (modal) modal.classList.remove('active');
   };
 
-  btnClose.addEventListener('click', closeLoginModal);
-  btnAccountAction.addEventListener('click', openLoginModal);
-  sidebarAccountPill.addEventListener('click', openLoginModal);
+  if (btnClose) btnClose.addEventListener('click', closeLoginModal);
+  if (btnAccountAction) btnAccountAction.addEventListener('click', openLoginModal);
+  if (sidebarAccountPill) sidebarAccountPill.addEventListener('click', openLoginModal);
+  if (btnOpenBotLoginModal) btnOpenBotLoginModal.addEventListener('click', openLoginModal);
+  if (botAuthStatusPill) botAuthStatusPill.addEventListener('click', openLoginModal);
+  if (btnLogoutBotModal) btnLogoutBotModal.addEventListener('click', handleBotLogout);
+
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeLoginModal();
+    });
+  }
 
   // Tab switching inside modal
   const tabs = [
@@ -1304,6 +1424,10 @@ function initLoginModal() {
   const tokenInput = document.getElementById('directTokenInput');
   if (tokenInput && !tokenInput.value) {
     tokenInput.value = AppState.authToken;
+  }
+  const devIdInput = document.getElementById('directDeviceIdInput');
+  if (devIdInput && !devIdInput.value) {
+    devIdInput.value = AppState.deviceId;
   }
 
   // Submit Email Login
@@ -1835,6 +1959,48 @@ function initBotModeratorModule() {
           botStatusText.innerHTML = `<span style="color:var(--text-muted);">Inativo</span>`;
         }
       }
+
+      // Atualização dos Dados da Conta Oficial do Robô
+      const botAccountNameEl = document.getElementById('botAccountName');
+      const botAccountUserIdEl = document.getElementById('botAccountUserId');
+      const botAuthStatusPill = document.getElementById('botAuthStatusPill');
+      const botOnlineIndicator = document.getElementById('botOnlineIndicator');
+      const sidebarUsername = document.getElementById('sidebarUsername');
+      const sidebarSharedId = document.getElementById('sidebarSharedId');
+      const btnLogoutBotModal = document.getElementById('btnLogoutBotModal');
+
+      const isBotLoggedIn = !!(data.isLoggedIn || (data.config && data.config.botToken && !data.authFailed));
+      const botName = (data.config && data.config.botName) ? data.config.botName : 'Átila';
+      const botUserId = (data.config && data.config.botUserId) ? data.config.botUserId : '32037361';
+
+      if (botAccountNameEl) botAccountNameEl.textContent = botName;
+      if (botAccountUserIdEl) botAccountUserIdEl.textContent = botUserId;
+      if (sidebarUsername) sidebarUsername.textContent = `${botName} (Robô Oficial)`;
+      if (sidebarSharedId) sidebarSharedId.textContent = botUserId;
+
+      if (botAuthStatusPill) {
+        if (isBotLoggedIn) {
+          botAuthStatusPill.className = 'badge-tag live-badge';
+          botAuthStatusPill.style.background = 'rgba(16, 185, 129, 0.2)';
+          botAuthStatusPill.style.color = '#34d399';
+          botAuthStatusPill.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+          botAuthStatusPill.innerHTML = `<span>✅ CONECTADO (${escapeHtml(botName)})</span>`;
+          botAuthStatusPill.title = 'Conta do Robô autenticada com sucesso no SuperLive';
+          if (botOnlineIndicator) botOnlineIndicator.className = 'online-indicator active';
+          if (btnLogoutBotModal) btnLogoutBotModal.style.display = 'inline-block';
+        } else {
+          botAuthStatusPill.className = 'badge-tag';
+          botAuthStatusPill.style.background = 'rgba(239, 68, 68, 0.2)';
+          botAuthStatusPill.style.color = '#f87171';
+          botAuthStatusPill.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+          botAuthStatusPill.innerHTML = `<span>⚠️ NÃO LOGADO (Clique para Login)</span>`;
+          botAuthStatusPill.title = 'A conta do robô não está logada ou a sessão expirou. Clique para conectar.';
+          if (botOnlineIndicator) botOnlineIndicator.className = 'online-indicator';
+          if (btnLogoutBotModal) btnLogoutBotModal.style.display = 'none';
+        }
+      }
+
+      window.triggerBotStatusRefresh = syncBotStatus;
 
       // Badge no Menu Lateral
       if (botNavBadge) {

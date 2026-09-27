@@ -207,6 +207,46 @@ const server = http.createServer(async (req, res) => {
         return;
       }
 
+      if (pathname === '/api/bot/login' && req.method === 'POST') {
+        const body = await readJsonBody(req);
+        let result;
+        if (body.type === 'email' || (body.email && body.password)) {
+          result = await botEngine.loginWithEmail(body.email, body.password);
+        } else if (body.type === 'token' || body.token) {
+          result = await botEngine.loginWithToken(body.token, body.deviceId);
+        } else if (body.type === 'phone_verify') {
+          result = await botEngine.verifyPhoneCode(body.phone_verification_id, body.phone_number, body.code);
+        } else {
+          result = { success: false, error: 'Método de login não especificado.' };
+        }
+        res.writeHead(200);
+        res.end(JSON.stringify(result));
+        return;
+      }
+
+      if (pathname === '/api/bot/logout' && req.method === 'POST') {
+        const result = botEngine.logoutBot();
+        res.writeHead(200);
+        res.end(JSON.stringify(result));
+        return;
+      }
+
+      if (pathname === '/api/bot/send-phone-code' && req.method === 'POST') {
+        const body = await readJsonBody(req);
+        const result = await botEngine.sendPhoneCode(body.phone_number, body.is_retry);
+        res.writeHead(200);
+        res.end(JSON.stringify(result));
+        return;
+      }
+
+      if (pathname === '/api/bot/verify-phone-code' && req.method === 'POST') {
+        const body = await readJsonBody(req);
+        const result = await botEngine.verifyPhoneCode(body.phone_verification_id, body.phone_number, body.code);
+        res.writeHead(200);
+        res.end(JSON.stringify(result));
+        return;
+      }
+
       if (pathname === '/api/bot/config') {
         if (req.method === 'GET') {
           res.writeHead(200);

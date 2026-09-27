@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "last_updated": "2026-09-27T13:34:02.454Z",
+  "last_updated": "2026-09-27T13:52:39.626Z",
   "config": {
     "creatorUserId": "69622983",
     "livestreamId": "",
@@ -96,7 +96,11 @@
       "followers": 207553,
       "isLive": false,
       "livestreamId": null,
-      "lastSeen": "2026-09-27T13:34:02.451Z"
+      "headline": "Live ao Vivo",
+      "lastSeen": "2026-09-27T13:34:02.451Z",
+      "liveFound": false,
+      "viewers": 0,
+      "is_modded": false
     }
   },
   "recurring_messages": [
@@ -167,6 +171,141 @@
     }
   ],
   "system_logs": [
+    {
+      "id": "sys-1790517159626-1cwn",
+      "timestamp": "10:52:39",
+      "isoTime": "2026-09-27T13:52:39.626Z",
+      "category": "API",
+      "level": "WARN",
+      "message": "Token rejeitado: Token rejeitado pelo SuperLive. Verifique o valor e o Device-ID.",
+      "details": null
+    },
+    {
+      "id": "sys-1790517159191-pi6d",
+      "timestamp": "10:52:39",
+      "isoTime": "2026-09-27T13:52:39.191Z",
+      "category": "API",
+      "level": "INFO",
+      "message": "Validando token de acesso oficial do robô...",
+      "details": null
+    },
+    {
+      "id": "sys-1790517149041-8f7a",
+      "timestamp": "10:52:29",
+      "isoTime": "2026-09-27T13:52:29.041Z",
+      "category": "API",
+      "level": "ERROR",
+      "message": "Falha no login do robô via Email: There are no registered users with this email.",
+      "details": null
+    },
+    {
+      "id": "sys-1790517148345-s7ei",
+      "timestamp": "10:52:28",
+      "isoTime": "2026-09-27T13:52:28.345Z",
+      "category": "API",
+      "level": "INFO",
+      "message": "Iniciando autenticação oficial no SuperLive para o robô: teste@invalido.com...",
+      "details": null
+    },
+    {
+      "id": "sys-1790517086033-new5",
+      "timestamp": "10:51:26",
+      "isoTime": "2026-09-27T13:51:26.060Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790516544108-1o2u",
+      "timestamp": "10:42:24",
+      "isoTime": "2026-09-27T13:42:24.131Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790516533555-s5dc",
+      "timestamp": "10:42:13",
+      "isoTime": "2026-09-27T13:42:13.580Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790516344544-fh4o",
+      "timestamp": "10:39:04",
+      "isoTime": "2026-09-27T13:39:04.570Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790516295265-ywku",
+      "timestamp": "10:38:15",
+      "isoTime": "2026-09-27T13:38:15.289Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790516284468-6ocv",
+      "timestamp": "10:38:04",
+      "isoTime": "2026-09-27T13:38:04.494Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790516267975-ps4i",
+      "timestamp": "10:37:47",
+      "isoTime": "2026-09-27T13:37:48.008Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790516258747-t39j",
+      "timestamp": "10:37:38",
+      "isoTime": "2026-09-27T13:37:38.783Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790516248289-eiwk",
+      "timestamp": "10:37:28",
+      "isoTime": "2026-09-27T13:37:28.326Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790516239044-3jk3",
+      "timestamp": "10:37:19",
+      "isoTime": "2026-09-27T13:37:19.083Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790516229988-olc7",
+      "timestamp": "10:37:09",
+      "isoTime": "2026-09-27T13:37:10.021Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
     {
       "id": "sys-1790516042441-x49a",
       "timestamp": "10:34:02",
@@ -4527,141 +4666,6 @@
       "id": "sys-1790469525716-9ljm",
       "timestamp": "21:38:45",
       "isoTime": "2026-09-27T00:38:45.716Z",
-      "category": "WS",
-      "level": "INFO",
-      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
-      "details": null
-    },
-    {
-      "id": "sys-1790469523709-aj66",
-      "timestamp": "21:38:43",
-      "isoTime": "2026-09-27T00:38:43.709Z",
-      "category": "WS",
-      "level": "WARN",
-      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
-      "details": null
-    },
-    {
-      "id": "sys-1790469517825-xn74",
-      "timestamp": "21:38:37",
-      "isoTime": "2026-09-27T00:38:37.825Z",
-      "category": "WS",
-      "level": "SUCCESS",
-      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
-      "details": null
-    },
-    {
-      "id": "sys-1790469517224-pzxg",
-      "timestamp": "21:38:37",
-      "isoTime": "2026-09-27T00:38:37.224Z",
-      "category": "WS",
-      "level": "INFO",
-      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
-      "details": null
-    },
-    {
-      "id": "sys-1790469515215-09mo",
-      "timestamp": "21:38:35",
-      "isoTime": "2026-09-27T00:38:35.215Z",
-      "category": "WS",
-      "level": "WARN",
-      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
-      "details": null
-    },
-    {
-      "id": "sys-1790469507572-6ilh",
-      "timestamp": "21:38:27",
-      "isoTime": "2026-09-27T00:38:27.572Z",
-      "category": "WS",
-      "level": "SUCCESS",
-      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
-      "details": null
-    },
-    {
-      "id": "sys-1790469506980-163y",
-      "timestamp": "21:38:26",
-      "isoTime": "2026-09-27T00:38:26.980Z",
-      "category": "WS",
-      "level": "INFO",
-      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
-      "details": null
-    },
-    {
-      "id": "sys-1790469504961-txmp",
-      "timestamp": "21:38:24",
-      "isoTime": "2026-09-27T00:38:24.961Z",
-      "category": "WS",
-      "level": "WARN",
-      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
-      "details": null
-    },
-    {
-      "id": "sys-1790469499057-494o",
-      "timestamp": "21:38:19",
-      "isoTime": "2026-09-27T00:38:19.057Z",
-      "category": "WS",
-      "level": "SUCCESS",
-      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
-      "details": null
-    },
-    {
-      "id": "sys-1790469498488-8y5d",
-      "timestamp": "21:38:18",
-      "isoTime": "2026-09-27T00:38:18.488Z",
-      "category": "WS",
-      "level": "INFO",
-      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
-      "details": null
-    },
-    {
-      "id": "sys-1790469496470-xuw8",
-      "timestamp": "21:38:16",
-      "isoTime": "2026-09-27T00:38:16.470Z",
-      "category": "WS",
-      "level": "WARN",
-      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
-      "details": null
-    },
-    {
-      "id": "sys-1790469488875-vuc7",
-      "timestamp": "21:38:08",
-      "isoTime": "2026-09-27T00:38:08.875Z",
-      "category": "WS",
-      "level": "SUCCESS",
-      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
-      "details": null
-    },
-    {
-      "id": "sys-1790469488295-t1i4",
-      "timestamp": "21:38:08",
-      "isoTime": "2026-09-27T00:38:08.295Z",
-      "category": "WS",
-      "level": "INFO",
-      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
-      "details": null
-    },
-    {
-      "id": "sys-1790469486290-yke5",
-      "timestamp": "21:38:06",
-      "isoTime": "2026-09-27T00:38:06.290Z",
-      "category": "WS",
-      "level": "WARN",
-      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
-      "details": null
-    },
-    {
-      "id": "sys-1790469480346-0mjk",
-      "timestamp": "21:38:00",
-      "isoTime": "2026-09-27T00:38:00.346Z",
-      "category": "WS",
-      "level": "SUCCESS",
-      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
-      "details": null
-    },
-    {
-      "id": "sys-1790469479759-p8rj",
-      "timestamp": "21:37:59",
-      "isoTime": "2026-09-27T00:37:59.759Z",
       "category": "WS",
       "level": "INFO",
       "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
