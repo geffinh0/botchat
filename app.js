@@ -118,6 +118,17 @@ function clearStaleServiceWorkerAndCaches() {
   }
 }
 
+// --- 2.5 Função Auxiliar Global de Sanitização HTML ---
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // --- 3. Sistema de Notificações Toast ---
 function initToasts() {
   window.showToast = function(message, type = 'info', duration = 3800) {
@@ -233,39 +244,34 @@ async function validateAndLoadAccount(options = {}) {
   const silent = !!options.silent;
   if (!AppState.userProfile && !AppState.botConnected) updateAuthUI(true, 'Conectando...');
 
-  const res = await apiCall('users/own_profile', 'POST', {});
+  try {
+    const res = await apiCall('users/own_profile', 'POST', {});
 
-  if (res.ok && res.data) {
-    AppState.isLoggedIn = true;
-    const profile = res.data.user || res.data;
-    AppState.userProfile = profile;
-    AppState.botUser = profile;
-    AppState.diamondsBalance = profile.diamonds || 0;
-    AppState.coinsBalance = profile.coins || 0;
+    if (res.ok && res.data) {
+      AppState.isLoggedIn = true;
+      const profile = res.data.user || res.data;
+      AppState.userProfile = profile;
+      AppState.botUser = profile;
+      AppState.diamondsBalance = profile.diamonds || 0;
+      AppState.coinsBalance = profile.coins || 0;
 
-    updateAuthUI(true, profile.name || 'Átila');
-    showToast(`Bem-vindo, ${profile.name || 'Átila'}! Conta conectada com sucesso.`, 'success');
-
-    // Load full account financial, settings, rankings and history
-    await Promise.allSettled([
-      fetchEarningStatistics(AppState.selectedTimeframe),
-      fetchPayoutChart(),
-      fetchPurchaseHistory(),
-      fetchUserSettings(),
-      fetchLeaderboard(),
-      fetchAnalytics()
-    ]);
-  } else {
-    const msg = res.data?.error?.message || 'Não foi possível carregar o perfil da conta agora.';
-    // O login do robô é independente da hidratação do painel. Se a conta
-    // do robô já foi autenticada pelo backend, não derrubamos a UI para
-    // "desconectado" só porque uma chamada complementar falhou.
-    if (!AppState.botConnected) {
-      AppState.isLoggedIn = false;
-      AppState.userProfile = null;
-      updateAuthUI(false);
-    } else if (!silent) {
-      showToast(`Conta conectada, mas o perfil não pôde ser carregado agora: ${msg}`, 'warning');
+      updateAuthUI(true, profile.name || 'Átila');
+      if (!silent) {
+        showToast(`Bem-vindo, ${profile.name || 'Átila'}! Conta conectada com sucesso.`, 'success');
+      }
+    } else {
+      const msg = res.data?.error?.message || 'Não foi possível carregar o perfil da conta agora.';
+      if (!AppState.botConnected) {
+        AppState.isLoggedIn = false;
+        AppState.userProfile = null;
+        updateAuthUI(false);
+      } else if (!silent) {
+        showToast(`Conta conectada, mas o perfil não pôde ser carregado agora: ${msg}`, 'warning');
+      }
+    }
+  } catch (err) {
+    if (!silent) {
+      console.warn('[AUTH] Falha ao carregar perfil:', err.message);
     }
   }
 }
@@ -305,7 +311,7 @@ async function handleEmailLogin(email, password) {
       if (window.triggerBotStatusRefresh) {
         window.triggerBotStatusRefresh();
       }
-      await validateAndLoadAccount();
+      validateAndLoadAccount({ silent: true }).catch(() => {});
     } else {
       const errMsg = data?.error || 'Email ou senha incorretos no SuperLive.';
       if (alertBox) {
@@ -367,7 +373,7 @@ async function handleTokenLogin(token, deviceId) {
       if (window.triggerBotStatusRefresh) {
         window.triggerBotStatusRefresh();
       }
-      await validateAndLoadAccount();
+      validateAndLoadAccount({ silent: true }).catch(() => {});
     } else {
       const errMsg = data?.error || 'Token rejeitado pelo SuperLive. Verifique o valor e o Device-ID.';
       if (alertBox) {
@@ -556,7 +562,7 @@ async function handleVerifyPhoneCode() {
       if (window.triggerBotStatusRefresh) {
         window.triggerBotStatusRefresh();
       }
-      await validateAndLoadAccount();
+      validateAndLoadAccount({ silent: true }).catch(() => {});
     } else {
       if (alertBox) {
         alertBox.style.display = 'block';
@@ -642,22 +648,45 @@ function updateAuthUI(isLoggedIn, username = '') {
   const authStatusSub = document.getElementById('authStatusSub');
   const btnLogoutAccount = document.getElementById('btnLogoutAccount');
   const inputUserToken = document.getElementById('inputUserToken');
+  const botAuthStatusPill = document.getElementById('botAuthStatusPill');
+  const botAccountUserId = document.getElementById('botAccountUserId');
+  const botAccountName = document.getElementById('botAccountName');
+  const sidebarOnlineIndicator = document.getElementById('sidebarOnlineIndicator');
+  const botOnlineIndicator = document.getElementById('botOnlineIndicator');
+  const btnLogoutBotModal = document.getElementById('btnLogoutBotModal');
 
-  if (isLoggedIn && AppState.userProfile) {
-    const p = AppState.userProfile;
-    badge.className = 'badge-status live';
-    text.textContent = `🟢 Conectado: ${p.name || username}`;
-    actionBtn.innerHTML = `<span>👤 ${p.name || 'Minha Conta'}</span>`;
+  if (isLoggedIn) {
+    const p = AppState.userProfile || AppState.botUser || {};
+    const displayName = p.name || username || 'Robô';
+    const id = p.shared_id || p.user_id || p.id || '32037361';
 
-    sidebarUsername.textContent = p.name || 'Átila';
+    if (badge) badge.className = 'badge-status live';
+    if (text) text.textContent = `🟢 Robô Conectado: ${displayName}`;
+    if (actionBtn) actionBtn.innerHTML = `<span>👤 ${escapeHtml(displayName)}</span>`;
+
+    if (sidebarUsername) sidebarUsername.textContent = `${displayName} (Robô Oficial)`;
     const familyName = p.family_info?.family?.name ? ` • ${p.family_info.family.name}` : '';
-    sidebarLevelText.textContent = `Nível ${p.leveling_progress?.current_level || 6}${familyName}`;
+    if (sidebarLevelText) sidebarLevelText.textContent = `Nível ${p.leveling_progress?.current_level || 6}${familyName}`;
 
-    const id = p.shared_id || p.user_id;
     if (id) {
-      sidebarSharedId.textContent = id;
-      btnCopyUserId.style.display = 'inline-flex';
+      if (sidebarSharedId) sidebarSharedId.textContent = id;
+      if (btnCopyUserId) btnCopyUserId.style.display = 'inline-flex';
+      if (botAccountUserId) botAccountUserId.textContent = id;
     }
+    if (botAccountName) botAccountName.textContent = displayName;
+
+    if (botAuthStatusPill) {
+      botAuthStatusPill.className = 'badge-tag live-badge';
+      botAuthStatusPill.style.background = 'rgba(16, 185, 129, 0.2)';
+      botAuthStatusPill.style.color = '#34d399';
+      botAuthStatusPill.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+      botAuthStatusPill.innerHTML = `<span>✅ CONECTADO (${escapeHtml(displayName)})</span>`;
+      botAuthStatusPill.title = 'Conta do Robô autenticada com sucesso no SuperLive';
+    }
+
+    if (sidebarOnlineIndicator) sidebarOnlineIndicator.className = 'online-indicator active';
+    if (botOnlineIndicator) botOnlineIndicator.className = 'online-indicator active';
+    if (btnLogoutBotModal) btnLogoutBotModal.style.display = 'inline-block';
 
     // Avatar image resolution (SuperLive uses profile_images array)
     let avatarUrl = '';
@@ -665,23 +694,35 @@ function updateAuthUI(isLoggedIn, username = '') {
       avatarUrl = p.profile_images[0].thumbnail_url || p.profile_images[0].url;
     } else if (p.profile_image) {
       avatarUrl = p.profile_image.thumbnail_url || p.profile_image.url;
+    } else if (p.avatar) {
+      avatarUrl = p.avatar;
     }
 
-    if (avatarUrl) {
-      sidebarAvatarImg.src = avatarUrl;
-      sidebarAvatarImg.style.display = 'block';
-      sidebarAvatarLetter.style.display = 'none';
-    } else {
-      sidebarAvatarLetter.textContent = (p.name || 'A').charAt(0).toUpperCase();
-      sidebarAvatarLetter.style.display = 'block';
-      sidebarAvatarImg.style.display = 'none';
+    if (sidebarAvatarImg) {
+      if (avatarUrl) {
+        sidebarAvatarImg.src = avatarUrl;
+        sidebarAvatarImg.style.display = 'block';
+        if (sidebarAvatarLetter) sidebarAvatarLetter.style.display = 'none';
+      } else {
+        if (sidebarAvatarLetter) {
+          sidebarAvatarLetter.textContent = displayName.charAt(0).toUpperCase();
+          sidebarAvatarLetter.style.display = 'block';
+        }
+        sidebarAvatarImg.style.display = 'none';
+      }
+    } else if (sidebarAvatarLetter) {
+      sidebarAvatarLetter.textContent = displayName.charAt(0).toUpperCase() || '🤖';
     }
 
-    authStatusLabel.textContent = 'Conta Conectada';
-    authStatusLabel.style.color = 'var(--success)';
-    authStatusSub.textContent = `Usuário: ${p.name} (ID: ${id}) • Moedas: ${(p.coins || 0).toLocaleString('pt-BR')}`;
-    btnLogoutAccount.style.display = 'inline-flex';
-    inputUserToken.value = AppState.botConnected ? 'Sessão gerenciada com segurança pelo servidor' : '';
+    if (authStatusLabel) {
+      authStatusLabel.textContent = 'Conta Conectada';
+      authStatusLabel.style.color = 'var(--success)';
+    }
+    if (authStatusSub) {
+      authStatusSub.textContent = `Usuário: ${displayName} (ID: ${id}) • Moedas: ${(p.coins || 0).toLocaleString('pt-BR')}`;
+    }
+    if (btnLogoutAccount) btnLogoutAccount.style.display = 'inline-flex';
+    if (inputUserToken) inputUserToken.value = AppState.botConnected ? 'Sessão gerenciada com segurança pelo servidor' : '';
 
     // Update privacy switches according to profile
     const swCoins = document.getElementById('switchCoinsHidden');
@@ -699,22 +740,39 @@ function updateAuthUI(isLoggedIn, username = '') {
     const swAnon = document.getElementById('switchAnonymous');
     if (swAnon && p.anonymous_on_gifters_leaderboard !== undefined) swAnon.checked = p.anonymous_on_gifters_leaderboard;
   } else {
-    badge.className = 'badge-status disconnected';
-    text.textContent = 'Aguardando Login da Sua Conta';
-    actionBtn.innerHTML = '<span>🔑 Conectar Conta</span>';
+    if (badge) badge.className = 'badge-status disconnected';
+    if (text) text.textContent = '🔴 Robô não conectado';
+    if (actionBtn) actionBtn.innerHTML = '<span>🔑 Conectar Conta</span>';
 
-    sidebarUsername.textContent = 'Nenhuma Conta';
-    sidebarLevelText.textContent = 'Toque para conectar';
-    btnCopyUserId.style.display = 'none';
-    sidebarAvatarLetter.textContent = '👤';
-    sidebarAvatarLetter.style.display = 'block';
-    sidebarAvatarImg.style.display = 'none';
+    if (sidebarUsername) sidebarUsername.textContent = 'Nenhuma Conta';
+    if (sidebarLevelText) sidebarLevelText.textContent = 'Toque para conectar';
+    if (btnCopyUserId) btnCopyUserId.style.display = 'none';
+    if (sidebarAvatarLetter) {
+      sidebarAvatarLetter.textContent = '🤖';
+      sidebarAvatarLetter.style.display = 'block';
+    }
+    if (sidebarAvatarImg) sidebarAvatarImg.style.display = 'none';
 
-    authStatusLabel.textContent = 'Não Autenticado';
-    authStatusLabel.style.color = 'var(--warning)';
-    authStatusSub.textContent = 'Nenhuma credencial ativa';
-    btnLogoutAccount.style.display = 'none';
-    inputUserToken.value = '';
+    if (botAuthStatusPill) {
+      botAuthStatusPill.className = 'badge-tag';
+      botAuthStatusPill.style.background = 'rgba(239, 68, 68, 0.2)';
+      botAuthStatusPill.style.color = '#f87171';
+      botAuthStatusPill.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+      botAuthStatusPill.innerHTML = `<span>⚠️ NÃO LOGADO (Clique para Login)</span>`;
+      botAuthStatusPill.title = 'A conta do robô não está logada ou a sessão expirou. Clique para conectar.';
+    }
+
+    if (sidebarOnlineIndicator) sidebarOnlineIndicator.className = 'online-indicator';
+    if (botOnlineIndicator) botOnlineIndicator.className = 'online-indicator';
+    if (btnLogoutBotModal) btnLogoutBotModal.style.display = 'none';
+
+    if (authStatusLabel) {
+      authStatusLabel.textContent = 'Não Autenticado';
+      authStatusLabel.style.color = 'var(--warning)';
+    }
+    if (authStatusSub) authStatusSub.textContent = 'Nenhuma credencial ativa';
+    if (btnLogoutAccount) btnLogoutAccount.style.display = 'none';
+    if (inputUserToken) inputUserToken.value = '';
   }
 }
 
@@ -1004,9 +1062,14 @@ function renderBillingStats() {
   const usd = (diamonds / AppState.exchangeRate).toFixed(2);
   const brl = (usd * 5.45).toFixed(2);
 
-  document.getElementById('statDiamondsBalance').innerHTML = `${diamonds.toLocaleString('pt-BR')} <span class="unit">pts</span>`;
-  document.getElementById('statUsdEstimate').innerHTML = `$${usd} <span class="unit">USD</span>`;
-  document.getElementById('statExchangeRateInfo').textContent = `Taxa Oficial: 1 USD = ${AppState.exchangeRate} Diamantes (≈ R$ ${brl})`;
+  const statDiamondsBalance = document.getElementById('statDiamondsBalance');
+  if (statDiamondsBalance) statDiamondsBalance.innerHTML = `${diamonds.toLocaleString('pt-BR')} <span class="unit">pts</span>`;
+
+  const statUsdEstimate = document.getElementById('statUsdEstimate');
+  if (statUsdEstimate) statUsdEstimate.innerHTML = `$${usd} <span class="unit">USD</span>`;
+
+  const statExchangeRateInfo = document.getElementById('statExchangeRateInfo');
+  if (statExchangeRateInfo) statExchangeRateInfo.textContent = `Taxa Oficial: 1 USD = ${AppState.exchangeRate} Diamantes (≈ R$ ${brl})`;
 
   const modalCashOutBalance = document.getElementById('modalCashOutBalance');
   if (modalCashOutBalance) {
@@ -1026,6 +1089,9 @@ function renderBillingStats() {
 }
 
 function renderDistributionBars() {
+  const container = document.getElementById('distributionList');
+  if (!container) return;
+
   const b = AppState.earningsBreakdown;
   const total = b.publicStream + b.privateStream + b.privateCall + b.conversation;
   const safeTotal = total > 0 ? total : 1;
@@ -1035,7 +1101,6 @@ function renderDistributionBars() {
   const pCall = ((b.privateCall / safeTotal) * 100).toFixed(1);
   const pChat = ((b.conversation / safeTotal) * 100).toFixed(1);
 
-  const container = document.getElementById('distributionList');
   container.innerHTML = `
     <div class="distribution-item">
       <div class="dist-header">
@@ -1070,6 +1135,7 @@ function renderDistributionBars() {
 
 function renderPayoutTiers() {
   const container = document.getElementById('payoutTiersContainer');
+  if (!container) return;
   container.innerHTML = '';
 
   AppState.payoutTiers.forEach((tier) => {
@@ -1085,8 +1151,10 @@ function renderPayoutTiers() {
       document.querySelectorAll('.tier-chip').forEach(c => c.classList.remove('selected'));
       chip.classList.add('selected');
       const diamondInput = document.getElementById('calcDiamondInput');
-      diamondInput.value = tier;
-      diamondInput.dispatchEvent(new Event('input'));
+      if (diamondInput) {
+        diamondInput.value = tier;
+        diamondInput.dispatchEvent(new Event('input'));
+      }
     });
 
     container.appendChild(chip);
@@ -1095,6 +1163,7 @@ function renderPayoutTiers() {
 
 function renderEarningsChart(timeframe, apiData = null) {
   const viewport = document.getElementById('earningsChartViewport');
+  if (!viewport) return;
   viewport.innerHTML = '';
 
   if (!AppState.diamondsBalance || AppState.diamondsBalance === 0) {
@@ -1139,6 +1208,7 @@ function renderEarningsChart(timeframe, apiData = null) {
 
 function renderPurchaseHistory() {
   const tbody = document.getElementById('purchaseHistoryBody');
+  if (!tbody) return;
   tbody.innerHTML = '';
 
   if (AppState.purchaseHistory.length === 0) {
@@ -1193,14 +1263,18 @@ function initRankingModule() {
   });
 
   // Country select
-  document.getElementById('countrySelect').addEventListener('change', (e) => {
-    AppState.selectedCountry = e.target.value;
-    fetchLeaderboard();
-  });
+  const countrySelect = document.getElementById('countrySelect');
+  if (countrySelect) {
+    countrySelect.addEventListener('change', (e) => {
+      AppState.selectedCountry = e.target.value;
+      fetchLeaderboard();
+    });
+  }
 }
 
 function renderLeaderboard() {
   const tbody = document.getElementById('leaderboardTableBody');
+  if (!tbody) return;
   tbody.innerHTML = '';
 
   const list = AppState.leaderboardData;
@@ -1447,18 +1521,23 @@ function initLoginModal() {
     });
   });
 
-  document.getElementById('btnGoBackToLogin').addEventListener('click', () => {
-    document.getElementById('tabBtnEmail').click();
-  });
+  const btnGoBack = document.getElementById('btnGoBackToLogin');
+  if (btnGoBack) {
+    btnGoBack.addEventListener('click', () => {
+      document.getElementById('tabBtnEmail')?.click();
+    });
+  }
 
   // Password toggle
   const pwdInput = document.getElementById('loginPassword');
   const pwdToggle = document.getElementById('btnTogglePassword');
-  pwdToggle.addEventListener('click', () => {
-    const isPassword = pwdInput.type === 'password';
-    pwdInput.type = isPassword ? 'text' : 'password';
-    pwdToggle.textContent = isPassword ? '🔒' : '👁️';
-  });
+  if (pwdToggle && pwdInput) {
+    pwdToggle.addEventListener('click', () => {
+      const isPassword = pwdInput.type === 'password';
+      pwdInput.type = isPassword ? 'text' : 'password';
+      pwdToggle.textContent = isPassword ? '🔒' : '👁️';
+    });
+  }
 
   // Pre-fill email and token inputs with user credentials
   const emailInput = document.getElementById('loginEmail');
@@ -1475,31 +1554,40 @@ function initLoginModal() {
   }
 
   // Submit Email Login
-  document.getElementById('btnSubmitEmailLogin').addEventListener('click', () => {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    if (!email || !password) {
-      showToast('Por favor, informe seu email e senha do SuperLive.', 'error');
-      return;
-    }
-    handleEmailLogin(email, password);
-  });
+  const btnSubmitEmail = document.getElementById('btnSubmitEmailLogin');
+  if (btnSubmitEmail) {
+    btnSubmitEmail.addEventListener('click', () => {
+      const email = document.getElementById('loginEmail')?.value.trim() || '';
+      const password = document.getElementById('loginPassword')?.value || '';
+      if (!email || !password) {
+        showToast('Por favor, informe seu email e senha do SuperLive.', 'error');
+        return;
+      }
+      handleEmailLogin(email, password);
+    });
+  }
 
   // Submit Token Login
-  document.getElementById('btnSubmitTokenLogin').addEventListener('click', () => {
-    const token = document.getElementById('directTokenInput').value.trim();
-    const devId = document.getElementById('directDeviceIdInput').value.trim();
-    if (!token) {
-      showToast('Por favor, cole seu Token de acesso.', 'error');
-      return;
-    }
-    handleTokenLogin(token, devId);
-  });
+  const btnSubmitToken = document.getElementById('btnSubmitTokenLogin');
+  if (btnSubmitToken) {
+    btnSubmitToken.addEventListener('click', () => {
+      const token = document.getElementById('directTokenInput')?.value.trim() || '';
+      const devId = document.getElementById('directDeviceIdInput')?.value.trim() || '';
+      if (!token) {
+        showToast('Por favor, cole seu Token de acesso.', 'error');
+        return;
+      }
+      handleTokenLogin(token, devId);
+    });
+  }
 
   // Register GUID from inside modal
-  document.getElementById('btnRegisterNewGuidModal').addEventListener('click', () => {
-    registerNewDeviceId();
-  });
+  const btnRegGuid = document.getElementById('btnRegisterNewGuidModal');
+  if (btnRegGuid) {
+    btnRegGuid.addEventListener('click', () => {
+      registerNewDeviceId();
+    });
+  }
 
   // --- Phone Login Event Listeners ---
   const btnSendPhoneCode = document.getElementById('btnSendPhoneCode');
@@ -1515,8 +1603,10 @@ function initLoginModal() {
   const btnBackToPhone = document.getElementById('btnBackToPhoneInput');
   if (btnBackToPhone) {
     btnBackToPhone.addEventListener('click', () => {
-      document.getElementById('phoneStep2').style.display = 'none';
-      document.getElementById('phoneStep1').style.display = 'flex';
+      const p2 = document.getElementById('phoneStep2');
+      const p1 = document.getElementById('phoneStep1');
+      if (p2) p2.style.display = 'none';
+      if (p1) p1.style.display = 'flex';
       if (phoneResendCountdown) clearInterval(phoneResendCountdown);
     });
   }
@@ -1550,7 +1640,7 @@ function initLoginModal() {
   const phoneInput = document.getElementById('loginPhoneNumber');
   if (phoneInput) {
     phoneInput.addEventListener('input', (e) => {
-      const countryCode = document.getElementById('loginPhoneCountryCode').value;
+      const countryCode = document.getElementById('loginPhoneCountryCode')?.value || '+55';
       if (countryCode === '+55') {
         let v = e.target.value.replace(/\D/g, '');
         if (v.length > 11) v = v.slice(0, 11);
@@ -1573,15 +1663,17 @@ function initLoginModal() {
 
 function initCopyUserId() {
   const btn = document.getElementById('btnCopyUserId');
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const id = document.getElementById('sidebarSharedId').textContent;
-    if (id && id !== '--') {
-      navigator.clipboard.writeText(id).then(() => {
-        showToast(`ID ${id} copiado para a área de transferência!`, 'success');
-      });
-    }
-  });
+  if (btn) {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = document.getElementById('sidebarSharedId')?.textContent;
+      if (id && id !== '--') {
+        navigator.clipboard.writeText(id).then(() => {
+          showToast(`ID ${id} copiado para a área de transferência!`, 'success');
+        });
+      }
+    });
+  }
 }
 
 // --- 12. Modal de Resgate / Saque (Cash-Out) ---
