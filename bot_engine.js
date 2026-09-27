@@ -15,7 +15,7 @@ const REMOTE_API_HOST = 'api.sprlv-api.com';
 const REMOTE_WS_HOST = 'wss://ws.sprlv-api.com';
 
 const DEFAULT_CONFIG = {
-  creatorUserId: '25302248',
+  creatorUserId: '',
   livestreamId: '',
   autoDetectLive: true,
   // Moderação
@@ -692,9 +692,20 @@ class BotEngine {
     }
   }
 
+  // --- Sanitização de Identificadores (remove #, @, ID:, links) ---
+  cleanIdentifier(input) {
+    let raw = String(input || '').trim();
+    if (raw.includes('sprlv.link/') || raw.includes('/profile/') || raw.includes('superlive.com/')) {
+      const parts = raw.split('/').filter(Boolean);
+      raw = parts[parts.length - 1] || raw;
+    }
+    raw = raw.replace(/^(id\s*[:=\s]+|#|@)/i, '').trim();
+    return raw;
+  }
+
   // --- Detecção de Live e Inicialização do Monitoramento ---
   async detectCreatorLive(creatorInput) {
-    const raw = String(creatorInput || this.config.creatorUserId || '').trim();
+    const raw = this.cleanIdentifier(creatorInput || this.config.creatorUserId || '');
     if (!raw) {
       throw new Error('Informe o ID da sua Live ou da sua Conta.');
     }
@@ -720,7 +731,12 @@ class BotEngine {
         if (!match && isNaN(Number(raw))) {
           match = searchRes.items.find(it => 
             it.name && it.name.toLowerCase().includes(raw.toLowerCase())
-          ) || searchRes.items[0];
+          );
+        }
+
+        // Se ainda não encontrou correspondência estrita, usa o primeiro item retornado da busca
+        if (!match && searchRes.items.length > 0) {
+          match = searchRes.items[0];
         }
 
         if (match) {
@@ -823,12 +839,63 @@ class BotEngine {
     throw new Error(`Nenhum perfil ou live encontrado com o identificador: "${raw}". Verifique se o ID ou nome de usuário está correto.`);
   }
 
+  async switchCreator(creatorInput) {
+    const raw = String(creatorInput || '').trim();
+    if (!raw) {
+      throw new Error('Informe o ID ou Shared ID da criadora para alternar.');
+    }
+
+    console.log(`[BOT SWITCH] Alternando para criadora: "${raw}"...`);
+
+    // 1. Pausa watchdog anterior e sai da sala da live antiga se estiver conectado
+    this.stopWatchdog();
+    if (this.activeLive && this.activeLive.livestream_id) {
+      try { this.sendWsLeaveLive(this.activeLive.livestream_id); } catch (e) {}
+    }
+    this.stopDualSync();
+    this.activeLive = null;
+    this.config.livestreamId = '';
+    this.saveConfig({ livestreamId: '', creatorUserId: raw }, false);
+    this.chatFeed = [];
+
+    // 2. Localiza dados reais do perfil e salva no banco
+    const detected = await this.detectCreatorLive(raw);
+    const resolvedId = String(detected.sharedId || detected.userId || raw);
+    this.config.creatorUserId = resolvedId;
+    this.saveConfig({ creatorUserId: resolvedId });
+    db.saveCreator(detected);
+
+    // 3. Se estiver em monitoramento ativo, conecta ou ativa Modo Vigilante
+    if (this.isMonitoring) {
+      if (detected.isLive && detected.livestreamId) {
+        await this.attachLive(detected.livestreamId, detected);
+      } else {
+        this.startWatchdog(resolvedId);
+        this.logAction('SYSTEM', `Robô alternado para ${detected.name} (Modo Vigilante). Monitorando início da live...`, '', 'VIGILANTE');
+      }
+    } else {
+      this.logAction('SYSTEM', `Perfil selecionado: "${detected.name}" (ID: ${resolvedId}). Robô pronto para iniciar.`, '', 'SISTEMA');
+    }
+
+    return { success: true, creator: detected, status: this.getStatus() };
+  }
+
   async startMonitoring({ livestreamId, creatorUserId }) {
     let targetLiveId = livestreamId;
     let creatorInfo = null;
 
     if (creatorUserId) {
-      this.config.creatorUserId = String(creatorUserId);
+      const cleanId = String(creatorUserId).trim();
+      // Se trocou de ID enquanto já estava conectado a outra live, desconecta a anterior
+      if (this.activeLive && String(this.config.creatorUserId) !== cleanId) {
+        if (this.activeLive.livestream_id) {
+          try { this.sendWsLeaveLive(this.activeLive.livestream_id); } catch (e) {}
+        }
+        this.stopDualSync();
+        this.activeLive = null;
+        this.config.livestreamId = '';
+      }
+      this.config.creatorUserId = cleanId;
       this.saveConfig(this.config);
     }
 
@@ -924,12 +991,14 @@ class BotEngine {
   stopMonitoring() {
     this.stopWatchdog();
     if (this.activeLive && this.activeLive.livestream_id) {
-      this.sendWsLeaveLive(this.activeLive.livestream_id);
+      try { this.sendWsLeaveLive(this.activeLive.livestream_id); } catch (e) {}
     }
     this.stopDualSync();
     this.stopRecurringQueue();
     this.isMonitoring = false;
     this.activeLive = null;
+    this.config.livestreamId = '';
+    this.saveConfig({ livestreamId: '' }, false);
     this.countdownSeconds = Number(this.config.recurringIntervalSeconds) || 120;
     this.chatFeed = [];
     this.logAction('SYSTEM', 'Monitoramento pausado. Robô pronto e aguardando sua live.', '', 'AGUARDANDO');

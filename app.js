@@ -1510,7 +1510,7 @@ function exportFinancialReport() {
 // =========================================================================
 function initBotModeratorModule() {
   let botConfig = {
-    creatorUserId: '25302248',
+    creatorUserId: '',
     livestreamId: '',
     autoDetectLive: true,
     moderationEnabled: true,
@@ -1551,6 +1551,11 @@ function initBotModeratorModule() {
   const btnSaveConfig = document.getElementById('btnBotSaveConfig');
   const btnDetectLive = document.getElementById('btnDetectLive');
   const inputCreatorUserId = document.getElementById('botCreatorUserId');
+  const selectSavedCreator = document.getElementById('botSelectSavedCreator');
+  const btnDeleteCreator = document.getElementById('btnDeleteSelectedCreator');
+  const savedCreatorsBadge = document.getElementById('savedCreatorsCountBadge');
+  let savedCreatorsList = [];
+
   const botWsBadge = document.getElementById('botWsStatusBadge');
   const botNavBadge = document.getElementById('botNavStatusBadge');
   const botStatusText = document.getElementById('botStatusText');
@@ -1678,9 +1683,48 @@ function initBotModeratorModule() {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   }
 
+  // --- Carregar Lista de Streamers Salvas ---
+  async function loadSavedCreators() {
+    try {
+      const res = await fetch('/api/bot/creators');
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data.success) return;
+
+      savedCreatorsList = data.creators || [];
+      if (savedCreatorsBadge) {
+        savedCreatorsBadge.textContent = `${savedCreatorsList.length} ${savedCreatorsList.length === 1 ? 'Salva' : 'Salvas'}`;
+      }
+
+      if (selectSavedCreator) {
+        const currentActiveId = (data.activeCreator && (data.activeCreator.sharedId || data.activeCreator.userId)) || botConfig.creatorUserId || '';
+        selectSavedCreator.innerHTML = '<option value="">-- Trocar Streamer --</option>';
+
+        savedCreatorsList.forEach((c) => {
+          const opt = document.createElement('option');
+          const uid = String(c.sharedId || c.userId || '');
+          opt.value = uid;
+          const liveMark = c.isLive ? '🔴 ' : '👤 ';
+          opt.textContent = `${liveMark}${c.name || 'Criadora'} (${uid})`;
+          if (uid && String(uid) === String(currentActiveId)) {
+            opt.selected = true;
+          }
+          selectSavedCreator.appendChild(opt);
+        });
+
+        if (btnDeleteCreator) {
+          btnDeleteCreator.style.display = selectSavedCreator.value ? 'inline-flex' : 'none';
+        }
+      }
+    } catch (e) {
+      console.warn('[BOT UI] Falha ao listar criadoras salvas:', e.message);
+    }
+  }
+
   // --- Carregar Configurações do Backend ---
   async function loadBotConfig() {
     try {
+      await loadSavedCreators();
       const res = await fetch('/api/bot/config');
       if (res.ok) {
         const data = await res.json();
@@ -1695,8 +1739,12 @@ function initBotModeratorModule() {
           ];
         }
 
-        // Preenche campos do formulário
-        if (inputCreatorUserId) inputCreatorUserId.value = botConfig.creatorUserId || '';
+        // Preenche campos do formulário sem travar o usuário
+        if (inputCreatorUserId && document.activeElement !== inputCreatorUserId) {
+          if (botConfig.creatorUserId) {
+            inputCreatorUserId.value = botConfig.creatorUserId;
+          }
+        }
         if (toggleModeration) toggleModeration.checked = botConfig.moderationEnabled;
         if (checkCaseSensitive) checkCaseSensitive.checked = botConfig.caseSensitive;
         if (checkExactMatch) checkExactMatch.checked = botConfig.exactMatch;
@@ -1835,6 +1883,19 @@ function initBotModeratorModule() {
       if (botCreatorDisplayNameEl && currentCreator) {
         const sharedTag = currentCreator.sharedId ? `(ID: ${currentCreator.sharedId})` : (currentCreator.userId ? `(ID: ${currentCreator.userId})` : '');
         botCreatorDisplayNameEl.textContent = `${currentCreator.name || 'Criadora'} ${sharedTag}`;
+      }
+
+      if (selectSavedCreator && currentCreator) {
+        const activeId = String(currentCreator.sharedId || currentCreator.userId || '');
+        if (activeId && selectSavedCreator.value !== activeId) {
+          const hasOption = Array.from(selectSavedCreator.options).some(o => o.value === activeId);
+          if (hasOption) {
+            selectSavedCreator.value = activeId;
+          }
+        }
+        if (btnDeleteCreator) {
+          btnDeleteCreator.style.display = selectSavedCreator.value ? 'inline-flex' : 'none';
+        }
       }
 
       if (liveBadgePill && liveBadgeText && liveInfoPreview) {
@@ -2021,56 +2082,126 @@ function initBotModeratorModule() {
     btnSaveConfig.addEventListener('click', () => saveBotConfig(true));
   }
 
-  // 3. Detectar Live Ativa
+  // 2.1 Alternar Streamer Salva Rapidamente
+  if (selectSavedCreator) {
+    selectSavedCreator.addEventListener('change', async () => {
+      const selectedId = selectSavedCreator.value;
+      if (btnDeleteCreator) {
+        btnDeleteCreator.style.display = selectedId ? 'inline-flex' : 'none';
+      }
+      if (!selectedId) return;
+
+      if (inputCreatorUserId) {
+        inputCreatorUserId.value = selectedId;
+      }
+      botConfig.creatorUserId = selectedId;
+
+      showToast(`Alternando para streamer #${selectedId}...`, 'info', 2000);
+      try {
+        const res = await fetch('/api/bot/switch-creator', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ creatorUserId: selectedId })
+        });
+        const d = await res.json();
+        if (d.success && d.creator) {
+          showToast(`Streamer alternada: ${d.creator.name}! ${d.creator.isLive ? '🔴 Live Conectada!' : '🛡️ Modo Vigilante Ativo'}`, 'success', 4000);
+        } else {
+          showToast(`Aviso: ${d.error || 'Não foi possível obter dados imediatos'}`, 'warning');
+        }
+        await loadSavedCreators();
+        await syncBotStatus();
+      } catch (err) {
+        showToast(`Erro ao alternar streamer: ${err.message}`, 'danger');
+      }
+    });
+  }
+
+  // 2.2 Excluir Streamer da Lista Salva
+  if (btnDeleteCreator) {
+    btnDeleteCreator.addEventListener('click', async () => {
+      const selectedId = selectSavedCreator ? selectSavedCreator.value : '';
+      if (!selectedId) return;
+
+      const found = savedCreatorsList.find(c => String(c.sharedId) === String(selectedId) || String(c.userId) === String(selectedId));
+      const streamerName = found ? found.name : `ID ${selectedId}`;
+
+      if (confirm(`Deseja remover a streamer "${streamerName}" da sua lista rápida de salvas?`)) {
+        try {
+          const res = await fetch('/api/bot/creators', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: selectedId })
+          });
+          const d = await res.json();
+          if (d.success) {
+            showToast(`Streamer "${streamerName}" removida da lista.`, 'info');
+            if (inputCreatorUserId && inputCreatorUserId.value === selectedId) {
+              inputCreatorUserId.value = '';
+            }
+            await loadSavedCreators();
+            await syncBotStatus();
+          }
+        } catch (e) {
+          showToast(`Erro ao excluir streamer: ${e.message}`, 'danger');
+        }
+      }
+    });
+  }
+
+  // 3. Conectar à Streamer / Detectar Live Ativa
   if (btnDetectLive) {
     btnDetectLive.addEventListener('click', async () => {
       const creatorId = inputCreatorUserId ? inputCreatorUserId.value.trim() : botConfig.creatorUserId;
       if (!creatorId) {
-        showToast('Digite o ID da sua Live ou da sua Conta.', 'warning');
+        showToast('Digite o ID, Shared ID ou Nome da streamer para conectar.', 'warning');
         return;
       }
       btnDetectLive.disabled = true;
-      btnDetectLive.innerHTML = '<span>⏳ Checando...</span>';
+      btnDetectLive.innerHTML = '<span>⏳ Conectando...</span>';
       try {
-        const res = await fetch('/api/bot/detect-live', {
+        const res = await fetch('/api/bot/switch-creator', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ creatorUserId: creatorId })
         });
         const d = await res.json();
-        if (d.success && d.data) {
-          const info = d.data;
+        if (d.success && d.creator) {
+          const info = d.creator;
           botConfig.creatorUserId = info.sharedId || info.userId || creatorId;
           if (inputCreatorUserId) inputCreatorUserId.value = info.sharedId || info.userId || creatorId;
           if (info.livestreamId) {
             botConfig.livestreamId = info.livestreamId;
+          } else {
+            botConfig.livestreamId = '';
           }
           saveBotConfig(false);
-
-          // Inicia automaticamente o monitoramento da live ou Modo Vigilante
-          await fetch('/api/bot/start', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              creatorUserId: info.sharedId || info.userId || creatorId, 
-              livestreamId: info.livestreamId || null 
-            })
-          });
 
           if (info.isLive || info.liveFound || info.livestreamId) {
             showToast(`🔴 Live #${info.livestreamId || creatorId} de "${info.name}" detectada! Moderação iniciada!`, 'success', 5000);
           } else {
-            showToast(`🛡️ Perfil de "${info.name}" (ID: ${info.sharedId || info.userId}) detectado! Modo Vigilante ATIVADO — o robô monitorará e entrará na live automaticamente!`, 'success', 5000);
+            showToast(`🛡️ Perfil de "${info.name}" (ID: ${info.sharedId || info.userId}) conectado! Modo Vigilante ATIVADO!`, 'success', 5000);
           }
         } else {
           showToast(d.error || 'Nenhum perfil ou live encontrado com o identificador informado.', 'danger');
         }
+        await loadSavedCreators();
         await syncBotStatus();
       } catch (e) {
-        showToast(`Erro ao detectar live: ${e.message}`, 'danger');
+        showToast(`Erro ao conectar: ${e.message}`, 'danger');
       } finally {
         btnDetectLive.disabled = false;
-        btnDetectLive.innerHTML = '<span>🔍 Detectar Live Ativa</span>';
+        btnDetectLive.innerHTML = '<span>🔍 Conectar</span>';
+      }
+    });
+  }
+
+  // 3.1 Tecla Enter no campo de ID da streamer
+  if (inputCreatorUserId && btnDetectLive) {
+    inputCreatorUserId.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        btnDetectLive.click();
       }
     });
   }

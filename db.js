@@ -22,7 +22,7 @@ const DEFAULT_DB = {
   version: '2.0.0',
   last_updated: new Date().toISOString(),
   config: {
-    creatorUserId: '93319686',
+    creatorUserId: '',
     livestreamId: '',
     autoDetectLive: true,
     moderationEnabled: true,
@@ -38,18 +38,21 @@ const DEFAULT_DB = {
     botName: '𝑨́𝒕𝒊𝒍𝒂',
     deviceId: 'e7a42524b5241eb9a73f28bc11b4f2ed'
   },
-  active_creator: {
-    userId: '17979782',
-    sharedId: '93319686',
-    name: '☀️ ᚠ Suni Chan ᛉ ⚜️',
-    username: 'ju_suni',
-    avatar: '',
-    diamonds: 2753653,
-    followers: 0,
-    isLive: false,
-    livestreamId: null,
-    headline: 'Live ao Vivo',
-    lastSeen: new Date().toISOString()
+  active_creator: null,
+  creators: {
+    '35729338': {
+      userId: '26850812',
+      sharedId: '35729338',
+      name: '♡🌜LUA🌛♡',
+      username: 'luazinha',
+      avatar: 'https://cdn.sprlv-api.com/pp/26850812/33505cd567041df330929afa075752c1_b',
+      diamonds: 1452791,
+      followers: 224442,
+      isLive: false,
+      livestreamId: null,
+      headline: 'Live ao Vivo',
+      lastSeen: new Date().toISOString()
+    }
   },
   recurring_messages: [
     {
@@ -113,8 +116,17 @@ class MiniDatabase {
           ...parsed,
           config: { ...DEFAULT_DB.config, ...(parsed.config || {}) },
           moderation_rules: { ...DEFAULT_DB.moderation_rules, ...(parsed.moderation_rules || {}) },
-          active_creator: { ...DEFAULT_DB.active_creator, ...(parsed.active_creator || {}) }
+          active_creator: parsed.active_creator !== undefined ? parsed.active_creator : DEFAULT_DB.active_creator,
+          creators: { ...(DEFAULT_DB.creators || {}), ...(parsed.creators || {}) }
         };
+        // Garante que criadora ativa esteja salva na lista de criadoras conhecidas
+        if (this.memoryData.active_creator && (this.memoryData.active_creator.userId || this.memoryData.active_creator.sharedId)) {
+          const uid = String(this.memoryData.active_creator.sharedId || this.memoryData.active_creator.userId);
+          this.memoryData.creators[uid] = {
+            ...this.memoryData.active_creator,
+            ...(this.memoryData.creators[uid] || {})
+          };
+        }
         console.log('[DB] Mini Banco de Dados carregado com sucesso de data/database.json');
         return;
       }
@@ -244,25 +256,101 @@ class MiniDatabase {
     return this.memoryData.active_creator || null;
   }
 
+  getCreatorsList() {
+    if (!this.memoryData.creators) this.memoryData.creators = {};
+    const seen = new Set();
+    const list = [];
+    for (const c of Object.values(this.memoryData.creators)) {
+      const key = String(c.sharedId || c.userId || '');
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        list.push(c);
+      }
+    }
+    return list;
+  }
+
+  saveCreator(creatorData) {
+    if (!creatorData || typeof creatorData !== 'object') return null;
+    const uid = String(creatorData.sharedId || creatorData.userId || '').trim();
+    if (!uid) return null;
+    if (!this.memoryData.creators) this.memoryData.creators = {};
+
+    const existing = this.memoryData.creators[uid] || {};
+    const item = {
+      userId: String(creatorData.userId || existing.userId || ''),
+      sharedId: String(creatorData.sharedId || existing.sharedId || uid),
+      name: creatorData.name || existing.name || 'Criadora',
+      username: creatorData.username || existing.username || '',
+      avatar: creatorData.avatar !== undefined ? creatorData.avatar : (existing.avatar || ''),
+      diamonds: creatorData.diamonds !== undefined ? creatorData.diamonds : (existing.diamonds || 0),
+      followers: creatorData.followers !== undefined ? creatorData.followers : (existing.followers || 0),
+      isLive: !!creatorData.isLive,
+      livestreamId: creatorData.livestreamId || null,
+      lastSeen: new Date().toISOString()
+    };
+    this.memoryData.creators[uid] = item;
+    this.persistSync();
+    return item;
+  }
+
+  deleteCreator(identifier) {
+    if (!identifier) return false;
+    const str = String(identifier).trim();
+    if (!this.memoryData.creators) return false;
+
+    let foundKey = null;
+    if (this.memoryData.creators[str]) {
+      foundKey = str;
+    } else {
+      for (const k in this.memoryData.creators) {
+        const c = this.memoryData.creators[k];
+        if (String(c.sharedId) === str || String(c.userId) === str) {
+          foundKey = k;
+          break;
+        }
+      }
+    }
+
+    if (foundKey) {
+      delete this.memoryData.creators[foundKey];
+      // Se era a criadora ativa, desativa ou seleciona outra
+      if (this.memoryData.active_creator && (String(this.memoryData.active_creator.sharedId) === foundKey || String(this.memoryData.active_creator.userId) === foundKey)) {
+        const remaining = Object.values(this.memoryData.creators);
+        if (remaining.length > 0) {
+          this.setActiveCreator(remaining[0]);
+        } else {
+          this.memoryData.active_creator = null;
+          this.memoryData.config.creatorUserId = '';
+        }
+      }
+      this.persistSync();
+      return true;
+    }
+    return false;
+  }
+
   setActiveCreator(creatorData) {
-    if (!creatorData || typeof creatorData !== 'object') return;
+    if (!creatorData || typeof creatorData !== 'object') return null;
 
     this.memoryData.active_creator = {
-      ...this.memoryData.active_creator,
+      ...(this.memoryData.active_creator || {}),
       ...creatorData,
       lastSeen: new Date().toISOString()
     };
 
     // Salva também no histórico de criadoras
-    const uid = String(creatorData.userId || creatorData.sharedId || '');
+    const uid = String(creatorData.sharedId || creatorData.userId || '').trim();
     if (uid) {
+      if (!this.memoryData.creators) this.memoryData.creators = {};
       this.memoryData.creators[uid] = {
+        ...this.memoryData.creators[uid],
         ...this.memoryData.active_creator
       };
     }
 
     // Sincroniza creatorUserId na config
-    if (creatorData.userId || creatorData.sharedId) {
+    if (creatorData.sharedId || creatorData.userId) {
       this.memoryData.config.creatorUserId = String(creatorData.sharedId || creatorData.userId);
     }
 
@@ -270,13 +358,22 @@ class MiniDatabase {
     return this.memoryData.active_creator;
   }
 
+  switchActiveCreator(identifier) {
+    const creator = this.getCreator(identifier);
+    if (creator) {
+      return this.setActiveCreator(creator);
+    }
+    return null;
+  }
+
   getCreator(identifier) {
     if (!identifier) return null;
-    const str = String(identifier);
+    const str = String(identifier).trim();
+    if (!this.memoryData.creators) return null;
     if (this.memoryData.creators[str]) return this.memoryData.creators[str];
     for (const id in this.memoryData.creators) {
       const c = this.memoryData.creators[id];
-      if (String(c.sharedId) === str || String(c.userId) === str) {
+      if (String(c.sharedId) === str || String(c.userId) === str || (c.username && c.username.toLowerCase() === str.toLowerCase())) {
         return c;
       }
     }

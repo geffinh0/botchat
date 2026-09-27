@@ -246,6 +246,37 @@ const server = http.createServer(async (req, res) => {
         return;
       }
 
+      if (pathname === '/api/bot/creators' && req.method === 'GET') {
+        res.writeHead(200);
+        res.end(JSON.stringify({
+          success: true,
+          creators: db.getCreatorsList(),
+          activeCreator: db.getActiveCreator()
+        }));
+        return;
+      }
+
+      if (pathname === '/api/bot/switch-creator' && req.method === 'POST') {
+        const body = await readJsonBody(req);
+        try {
+          const result = await botEngine.switchCreator(body.creatorUserId);
+          res.writeHead(200);
+          res.end(JSON.stringify(result));
+        } catch (err) {
+          res.writeHead(200);
+          res.end(JSON.stringify({ success: false, error: err.message }));
+        }
+        return;
+      }
+
+      if (pathname === '/api/bot/creators' && req.method === 'DELETE') {
+        const body = await readJsonBody(req);
+        const ok = db.deleteCreator(body.id || body.creatorUserId);
+        res.writeHead(200);
+        res.end(JSON.stringify({ success: ok, creators: db.getCreatorsList() }));
+        return;
+      }
+
       if (pathname === '/api/bot/detect-live' && req.method === 'POST') {
         const body = await readJsonBody(req);
         try {

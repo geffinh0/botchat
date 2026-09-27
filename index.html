@@ -136,13 +136,22 @@
 
             <!-- Creator Target & Live Connection Bar -->
             <div class="bot-creator-bar">
-              <div class="bot-creator-input-group">
-                <label for="botCreatorUserId">ID ou Shared ID da sua Live / Criadora:</label>
-                <div style="display:flex; gap:8px;">
-                  <input type="text" id="botCreatorUserId" class="custom-input" placeholder="Digite seu ID ou Shared ID..." value="" style="width:260px;">
-                  <button class="btn btn-secondary" id="btnDetectLive" title="Verificar se a sua live está ativa no SuperLive">
-                    <span>🔍 Detectar Live Ativa</span>
+              <div class="bot-creator-input-group" style="flex:1; min-width:320px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                  <label for="botCreatorUserId" style="display:flex; align-items:center; gap:6px;">
+                    <span>🎯 Streamer / Criadora Alvo:</span>
+                  </label>
+                  <span id="savedCreatorsCountBadge" class="badge-tag" style="font-size:10px; padding:1px 6px; background:rgba(99,102,241,0.15); color:#a5b4fc;">0 Salvas</span>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                  <select id="botSelectSavedCreator" class="custom-input" style="min-width:180px; max-width:240px; font-weight:600; cursor:pointer;" title="Alternar rapidamente entre streamers salvas">
+                    <option value="">-- Trocar Streamer --</option>
+                  </select>
+                  <input type="text" id="botCreatorUserId" class="custom-input" placeholder="ID / Shared ID ou Nome..." value="" style="width:190px;">
+                  <button class="btn btn-secondary" id="btnDetectLive" title="Verificar perfil e conectar o robô">
+                    <span>🔍 Conectar</span>
                   </button>
+                  <button class="btn-icon-xs delete" id="btnDeleteSelectedCreator" title="Remover streamer selecionada da lista salva" style="width:34px; height:34px; font-size:14px; display:none;">🗑️</button>
                 </div>
               </div>
 
