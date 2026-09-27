@@ -57,7 +57,13 @@ const REMOTE_API_HOST = 'api.sprlv-api.com';
 const REMOTE_API_BASE_PATH = '/api/v1';
 
 // Default registered Device-ID (obtained from official device/register endpoint)
-let cachedDeviceId = 'e7a42524b5241eb9a73f28bc11b4f2ed';
+let cachedDeviceId = process.env.SUPERLIVE_DEVICE_ID || '';
+
+function getPublicBotConfig() {
+  const cfg = botEngine.config || {};
+  const { botToken, ...publicConfig } = cfg;
+  return publicConfig;
+}
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=UTF-8',
@@ -167,6 +173,12 @@ const server = http.createServer(async (req, res) => {
 
       if (req.headers['authorization']) {
         proxyHeaders['Authorization'] = req.headers['authorization'];
+      } else {
+        const isPublicAuthRoute = targetPath === '/api/v1/device/register' || targetPath.startsWith('/api/v1/user/signup/');
+        const serverToken = botEngine && botEngine.config && botEngine.config.botToken;
+        if (!isPublicAuthRoute && serverToken) {
+          proxyHeaders['Authorization'] = `Token ${serverToken}`;
+        }
       }
 
       const proxyReq = https.request({
@@ -199,8 +211,8 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // --- Bot Engine & Mini-Database Management API Routes ---
-  if (pathname.startsWith('/api/bot/') || pathname.startsWith('/api/db/')) {
+  // --- Bot Engine API Routes ---
+  if (pathname.startsWith('/api/bot/')) {
     setCorsHeaders(res);
     res.setHeader('Content-Type', 'application/json');
 
@@ -242,6 +254,11 @@ const server = http.createServer(async (req, res) => {
         } else {
           result = { success: false, error: 'Método de login não especificado.' };
         }
+        // Entrega o estado atual junto com o resultado para a UI não depender
+        // de um ciclo de polling para refletir o login imediatamente.
+        if (result && result.success) {
+          result.status = botEngine.getStatus();
+        }
         res.writeHead(200);
         res.end(JSON.stringify(result));
         return;
@@ -249,6 +266,7 @@ const server = http.createServer(async (req, res) => {
 
       if (pathname === '/api/bot/logout' && req.method === 'POST') {
         const result = botEngine.logoutBot();
+        result.status = botEngine.getStatus();
         res.writeHead(200);
         res.end(JSON.stringify(result));
         return;
@@ -273,13 +291,17 @@ const server = http.createServer(async (req, res) => {
       if (pathname === '/api/bot/config') {
         if (req.method === 'GET') {
           res.writeHead(200);
-          res.end(JSON.stringify(botEngine.config));
+          res.end(JSON.stringify(getPublicBotConfig()));
           return;
         } else if (req.method === 'POST') {
           const body = await readJsonBody(req);
+          // O token da conta do robô é segredo de servidor e nunca é
+          // atualizado pelo formulário de configurações. O login/logout
+          // são os únicos fluxos autorizados a alterá-lo.
+          if (body && typeof body === 'object') delete body.botToken;
           const saved = botEngine.saveConfig(body);
           res.writeHead(200);
-          res.end(JSON.stringify({ success: true, config: saved }));
+          res.end(JSON.stringify({ success: true, config: getPublicBotConfig() }));
           return;
         }
       }
@@ -427,51 +449,6 @@ const server = http.createServer(async (req, res) => {
         return;
       }
 
-      // --- Mini-Banco de Dados Persistente API Routes ---
-      if (pathname === '/api/db/data' && req.method === 'GET') {
-        res.writeHead(200);
-        res.end(JSON.stringify({
-          success: true,
-          config: db.getConfig(),
-          activeCreator: db.getActiveCreator(),
-          recurringMessages: db.getRecurringMessages(),
-          moderationRules: db.getModerationRules(),
-          auditLogs: db.getAuditLogs(100),
-          systemLogs: db.getSystemLogs(200),
-          liveSessions: db.getLiveSessions()
-        }));
-        return;
-      }
-
-      if (pathname === '/api/db/recurring/add' && req.method === 'POST') {
-        const body = await readJsonBody(req);
-        const item = db.addRecurringMessage(body.text);
-        botEngine.config = db.getConfig();
-        res.writeHead(200);
-        res.end(JSON.stringify({ success: true, item, messages: db.getRecurringMessages() }));
-        return;
-      }
-
-      if (pathname === '/api/db/recurring/delete' && req.method === 'POST') {
-        const body = await readJsonBody(req);
-        const removed = db.removeRecurringMessage(Number(body.index));
-        botEngine.config = db.getConfig();
-        res.writeHead(200);
-        res.end(JSON.stringify({ success: true, removed, messages: db.getRecurringMessages() }));
-        return;
-      }
-
-      if (pathname === '/api/db/recurring/reorder' && req.method === 'POST') {
-        const body = await readJsonBody(req);
-        if (Array.isArray(body.messages)) {
-          db.setRecurringMessagesFromStrings(body.messages);
-          botEngine.config = db.getConfig();
-        }
-        res.writeHead(200);
-        res.end(JSON.stringify({ success: true, messages: db.getRecurringMessages() }));
-        return;
-      }
-
       res.writeHead(404);
       res.end(JSON.stringify({ error: 'Endpoint do bot não encontrado' }));
       return;
@@ -489,7 +466,7 @@ const server = http.createServer(async (req, res) => {
     res.end(JSON.stringify({
       status: 'ok',
       uptime: process.uptime(),
-      version: '2.31.0'
+      version: '2.33.0'
     }));
     return;
   }
@@ -501,7 +478,7 @@ const server = http.createServer(async (req, res) => {
       status: 'online',
       proxyHost: REMOTE_API_HOST,
       cachedDeviceId: cachedDeviceId,
-      version: '2.31.0',
+      version: '2.33.0',
       botEngineActive: true
     }));
     return;

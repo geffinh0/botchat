@@ -53,6 +53,9 @@ class BotEngine {
     this.wsConnected = false;
     this.authFailed = false;
     this.authState = this.config.botToken ? 'unknown' : 'logged_out';
+    this.authRevision = 0;
+    this.lastAuthAt = null;
+    this.lastAuthError = null;
     this.reconnectTimer = null;
     this.heartbeatTimer = null;
     this.syncPollTimer = null;
@@ -128,7 +131,10 @@ class BotEngine {
 
     if (newConfig && newConfig.botToken && newConfig.botToken !== previousToken) {
       this.authFailed = false;
-      this.authState = 'unknown';
+      // Não rebaixa uma autenticação recém-validada para 'unknown'.
+      // Isso fazia o login funcionar no backend, mas o /api/bot/status
+      // imediatamente voltar como isLoggedIn=false.
+      if (this.authState !== 'valid') this.authState = 'unknown';
       if (this.ws) {
         try { this.ws.close(); } catch (e) {}
       }
@@ -942,6 +948,11 @@ class BotEngine {
   }
 
   async startMonitoring({ livestreamId, creatorUserId }) {
+    const authenticated = this.authState === 'valid' && !!this.config.botToken && !this.authFailed;
+    if (!authenticated) {
+      throw new Error('A conta do robô não está autenticada. Faça login antes de iniciar a moderação.');
+    }
+
     let targetLiveId = livestreamId;
     let creatorInfo = null;
 
@@ -1317,6 +1328,7 @@ class BotEngine {
   }
 
   async validateStoredToken() {
+    const revision = this.authRevision;
     if (!this.config.botToken) {
       this.authState = 'logged_out';
       return false;
@@ -1365,8 +1377,10 @@ class BotEngine {
       const code = profile?.data?.error?.code;
       const status = profile?.status;
       if (status === 401 || code === 2 || code === '2' || status === 403) {
+        if (revision !== this.authRevision) return false;
         this.authFailed = true;
         this.authState = 'invalid';
+        this.lastAuthError = profile?.data?.error?.message || 'Token rejeitado pelo SuperLive.';
         this.logSystem('API', 'WARN', 'Token persistido rejeitado pelo SuperLive. Faça login novamente.');
         return false;
       }
@@ -1381,6 +1395,20 @@ class BotEngine {
     }
   }
 
+  async ensureDeviceId() {
+    if (this.config.deviceId) return this.config.deviceId;
+    try {
+      const guid = await this.registerDeviceId();
+      this.config.deviceId = String(guid);
+      db.saveConfig({ deviceId: this.config.deviceId });
+      this.logSystem('DEVICE', 'SUCCESS', `Device-ID oficial registrado: ${this.config.deviceId}`);
+      return this.config.deviceId;
+    } catch (e) {
+      this.logSystem('DEVICE', 'WARN', `Não foi possível registrar Device-ID automaticamente: ${e.message}`);
+      return '';
+    }
+  }
+
   // --- Métodos Oficiais de Autenticação da Conta do Robô ---
   async loginWithEmail(email, password) {
     const cleanEmail = String(email || '').trim();
@@ -1389,6 +1417,10 @@ class BotEngine {
     }
 
     this.logSystem('API', 'INFO', `Iniciando autenticação oficial no SuperLive para o robô: ${cleanEmail}...`);
+    this.authRevision++;
+    this.authFailed = false;
+    this.lastAuthError = null;
+    await this.ensureDeviceId();
     try {
       const res = await this.apiRequest('user/signup/email_signin', {
         email: cleanEmail,
@@ -1418,6 +1450,10 @@ class BotEngine {
     }
 
     this.logSystem('API', 'INFO', `Validando token de acesso oficial do robô...`);
+    this.authRevision++;
+    this.authFailed = false;
+    this.lastAuthError = null;
+    if (!this.config.deviceId) await this.ensureDeviceId();
     try {
       const payload = JSON.stringify({});
       const profile = await new Promise((resolve, reject) => {
@@ -1468,6 +1504,7 @@ class BotEngine {
     if (!rawNumber) return { success: false, error: 'Número de telefone obrigatório.' };
 
     this.logSystem('API', 'INFO', `Solicitando código de SMS SuperLive para ${rawNumber}...`);
+    await this.ensureDeviceId();
     try {
       const res = await this.apiRequest('user/signup/send_phone_verification_code', {
         phone_number: rawNumber,
@@ -1494,6 +1531,10 @@ class BotEngine {
     }
 
     this.logSystem('API', 'INFO', `Validando código SMS com SuperLive...`);
+    this.authRevision++;
+    this.authFailed = false;
+    this.lastAuthError = null;
+    await this.ensureDeviceId();
     try {
       const res = await this.apiRequest('user/signup/auth_phone', {
         phone_verification_id: phoneVerificationId,
@@ -1511,9 +1552,12 @@ class BotEngine {
   }
 
   async applyBotToken(token, userId, userData = null) {
+    this.authRevision++;
     this.config.botToken = token;
     this.authFailed = false;
     this.authState = 'valid';
+    this.lastAuthAt = new Date().toISOString();
+    this.lastAuthError = null;
 
     let userName = this.config.botName || 'Robô';
     let userSharedId = '';
@@ -1547,6 +1591,12 @@ class BotEngine {
       deviceId: this.config.deviceId
     }, false);
 
+    // saveConfig pode reinicializar o estado quando o token muda;
+    // aqui a validação já foi concluída, então o estado final é valid.
+    this.authFailed = false;
+    this.authState = 'valid';
+    this.lastAuthAt = new Date().toISOString();
+
     this.logSystem('SYSTEM', 'SUCCESS', `Conta do robô autenticada com sucesso: "${userName}" (ID: ${this.config.botUserId}, Shared: ${userSharedId || 'N/A'})`);
 
     // Reconecta WebSocket com credenciais válidas se ativo
@@ -1566,14 +1616,18 @@ class BotEngine {
         name: this.config.botName,
         sharedId: userSharedId,
         avatar: avatarUrl
-      }
+      },
+      deviceId: this.config.deviceId,
+      authState: this.authState
     };
   }
 
   logoutBot() {
+    this.authRevision++;
     this.config.botToken = '';
     this.authFailed = false;
     this.authState = 'logged_out';
+    this.lastAuthError = null;
     this.saveConfig({
       botToken: ''
     }, false);
@@ -1604,7 +1658,7 @@ class BotEngine {
       dualSyncActive: !!this.syncPollTimer,
       activeLive: this.activeLive,
       activeCreator: db.getActiveCreator(),
-      config: db.getConfig(),
+      config: (() => { const { botToken, ...safeConfig } = db.getConfig(); return safeConfig; })(),
       recurringMessages: db.getRecurringMessages(),
       moderationRules: db.getModerationRules(),
       liveSessions: db.getLiveSessions(),
@@ -1613,7 +1667,10 @@ class BotEngine {
       chatFeed: this.chatFeed.slice(0, 50),
       recentLogs: db.getAuditLogs(50),
       systemLogs: db.getSystemLogs(100),
-      errorCount: this.systemLogs.filter(l => l.level === 'ERROR').length
+      errorCount: this.systemLogs.filter(l => l.level === 'ERROR').length,
+      deviceId: this.config.deviceId || '',
+      lastAuthAt: this.lastAuthAt,
+      lastAuthError: this.lastAuthError
     };
   }
 }

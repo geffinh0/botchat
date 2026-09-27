@@ -66,3 +66,12 @@ No painel do Web Service, em **Health Check Path**, use:
 Esse endpoint retorna HTTP `200` enquanto o processo HTTP estiver ativo e pode ser usado pelo Render para verificar a saúde do serviço.
 
 O servidor também registra explicitamente as etapas de inicialização no log e trata `SIGTERM`, `uncaughtException`, `unhandledRejection` e erros do listener HTTP para facilitar o diagnóstico de falhas de deploy.
+
+## Render / produção
+
+- `Start Command`: `node server.js`
+- `Build Command`: `npm install`
+- `Health Check Path`: `/healthz`
+- O servidor usa `process.env.PORT` e faz bind em `0.0.0.0`.
+- O token da conta do robô permanece no backend; o navegador não persiste mais a credencial.
+- O login atualiza o estado do painel sem depender de um ciclo de polling.

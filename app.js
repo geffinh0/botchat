@@ -24,8 +24,11 @@ function getApiBaseUrl() {
 const AppState = {
   activeTab: 'bot',
   isLoggedIn: false,
+  botConnected: false,
+  botUser: null,
   apiHost: getApiBaseUrl(),
-  authToken: localStorage.getItem('sc_auth_token') || '',
+  // O token do robô fica exclusivamente no servidor.
+  authToken: '',
   deviceId: localStorage.getItem('sc_device_id') || '',
   exchangeRate: 150, // Taxa real oficial da conta (150 diamantes = $1.00 USD)
   diamondsBalance: 0,
@@ -62,8 +65,36 @@ document.addEventListener('DOMContentLoaded', async () => {
   initCornerLiveWidget();
   initSystemLogsModule();
 
+  // O painel atual é focado no Robô Moderador. Os antigos módulos
+  // financeiros/configuração foram removidos do HTML e não devem ser
+  // inicializados aqui, pois dependem de elementos que não existem mais.
+
   // Check server proxy status
   checkServerProxyStatus();
+
+  // Restaura a sessão do robô após um reload. Antes o token ficava salvo,
+  // mas nenhuma rotina era chamada para reidratar a UI.
+  setTimeout(async () => {
+    try {
+      const statusRes = await fetch('/api/bot/status', { cache: 'no-store' });
+      if (statusRes.ok) {
+        const status = await statusRes.json();
+        if (status.isLoggedIn && status.config) {
+          AppState.botConnected = true;
+          AppState.botUser = {
+            id: status.config.botUserId,
+            name: status.config.botName
+          };
+        }
+      }
+      if (AppState.botConnected) {
+        await validateAndLoadAccount({ silent: true });
+      }
+      if (window.triggerBotStatusRefresh) await window.triggerBotStatusRefresh();
+    } catch (e) {
+      console.warn('[BOOT UI] Falha ao restaurar sessão:', e.message);
+    }
+  }, 0);
 });
 
 function clearStaleServiceWorkerAndCaches() {
@@ -123,9 +154,6 @@ async function apiCall(endpoint, method = 'POST', bodyData = {}) {
     'Device-ID': AppState.deviceId
   };
 
-  if (AppState.authToken) {
-    headers['Authorization'] = `Token ${AppState.authToken}`;
-  }
 
   const reqOptions = {
     method,
@@ -201,8 +229,9 @@ function logHttpCall(method, endpoint, status, duration, responseData) {
 }
 
 // --- 5. Gerenciamento de Sessão & Autenticação ---
-async function validateAndLoadAccount() {
-  updateAuthUI(true, 'Conectando...');
+async function validateAndLoadAccount(options = {}) {
+  const silent = !!options.silent;
+  if (!AppState.userProfile && !AppState.botConnected) updateAuthUI(true, 'Conectando...');
 
   const res = await apiCall('users/own_profile', 'POST', {});
 
@@ -210,6 +239,7 @@ async function validateAndLoadAccount() {
     AppState.isLoggedIn = true;
     const profile = res.data.user || res.data;
     AppState.userProfile = profile;
+    AppState.botUser = profile;
     AppState.diamondsBalance = profile.diamonds || 0;
     AppState.coinsBalance = profile.coins || 0;
 
@@ -226,10 +256,17 @@ async function validateAndLoadAccount() {
       fetchAnalytics()
     ]);
   } else {
-    AppState.isLoggedIn = false;
-    updateAuthUI(false);
-    const msg = res.data?.error?.message || 'Token de autenticação expirado ou inválido.';
-    showToast(`Sessão não autorizada: ${msg}`, 'error');
+    const msg = res.data?.error?.message || 'Não foi possível carregar o perfil da conta agora.';
+    // O login do robô é independente da hidratação do painel. Se a conta
+    // do robô já foi autenticada pelo backend, não derrubamos a UI para
+    // "desconectado" só porque uma chamada complementar falhou.
+    if (!AppState.botConnected) {
+      AppState.isLoggedIn = false;
+      AppState.userProfile = null;
+      updateAuthUI(false);
+    } else if (!silent) {
+      showToast(`Conta conectada, mas o perfil não pôde ser carregado agora: ${msg}`, 'warning');
+    }
   }
 }
 
@@ -256,7 +293,10 @@ async function handleEmailLogin(email, password) {
     if (data && data.success && data.token) {
       AppState.authToken = data.token;
       AppState.isLoggedIn = true;
-      localStorage.setItem('sc_auth_token', data.token);
+      AppState.botConnected = true;
+      AppState.botUser = data.user || null;
+      AppState.userProfile = data.user || null;
+      updateAuthUI(true, data.user?.name || 'Robô');
 
       const name = data.user?.name || 'Robô';
       closeLoginModal();
@@ -315,7 +355,10 @@ async function handleTokenLogin(token, deviceId) {
     if (data && data.success && data.token) {
       AppState.authToken = data.token;
       AppState.isLoggedIn = true;
-      localStorage.setItem('sc_auth_token', data.token);
+      AppState.botConnected = true;
+      AppState.botUser = data.user || null;
+      AppState.userProfile = data.user || null;
+      updateAuthUI(true, data.user?.name || 'Robô');
 
       const name = data.user?.name || 'Robô';
       closeLoginModal();
@@ -355,8 +398,11 @@ async function handleBotLogout() {
     await fetch('/api/bot/logout', { method: 'POST' });
     AppState.authToken = '';
     AppState.isLoggedIn = false;
-    localStorage.removeItem('sc_auth_token');
+    AppState.botConnected = false;
+    AppState.botUser = null;
+    AppState.userProfile = null;
 
+    updateAuthUI(false);
     closeLoginModal();
     showToast('Conta do robô desconectada com sucesso.', 'info');
 
@@ -496,7 +542,10 @@ async function handleVerifyPhoneCode() {
     if (data && data.success && data.token) {
       AppState.authToken = data.token;
       AppState.isLoggedIn = true;
-      localStorage.setItem('sc_auth_token', data.token);
+      AppState.botConnected = true;
+      AppState.botUser = data.user || null;
+      AppState.userProfile = data.user || null;
+      updateAuthUI(true, data.user?.name || 'Robô');
 
       if (phoneResendCountdown) clearInterval(phoneResendCountdown);
 
@@ -567,10 +616,10 @@ function handleLogout() {
 
   AppState.authToken = '';
   AppState.isLoggedIn = false;
-  AppState.userProfile = null;
-  AppState.diamondsBalance = 0;
+  AppState.botConnected = false;
+  AppState.botUser = null;
+  AppState.userProfile = null;  AppState.diamondsBalance = 0;
   AppState.coinsBalance = 0;
-  localStorage.removeItem('sc_auth_token');
 
   updateAuthUI(false);
   renderBillingStats();
@@ -632,7 +681,7 @@ function updateAuthUI(isLoggedIn, username = '') {
     authStatusLabel.style.color = 'var(--success)';
     authStatusSub.textContent = `Usuário: ${p.name} (ID: ${id}) • Moedas: ${(p.coins || 0).toLocaleString('pt-BR')}`;
     btnLogoutAccount.style.display = 'inline-flex';
-    inputUserToken.value = AppState.authToken ? `Token ${AppState.authToken.slice(0, 8)}...${AppState.authToken.slice(-6)}` : '';
+    inputUserToken.value = AppState.botConnected ? 'Sessão gerenciada com segurança pelo servidor' : '';
 
     // Update privacy switches according to profile
     const swCoins = document.getElementById('switchCoinsHidden');
@@ -1338,7 +1387,7 @@ async function checkServerProxyStatus() {
     if (res.ok) {
       const data = await res.json();
       const el = document.getElementById('proxyStatusLabel');
-      if (el) el.textContent = `Online (Porta 3000 • GUID ${data.cachedDeviceId ? data.cachedDeviceId.slice(0, 8) : ''}...)`;
+      if (el) el.textContent = `Online • GUID ${data.cachedDeviceId ? data.cachedDeviceId.slice(0, 8) : ''}...`;
       if (data.cachedDeviceId && !localStorage.getItem('sc_device_id')) {
         AppState.deviceId = data.cachedDeviceId;
         localStorage.setItem('sc_device_id', data.cachedDeviceId);
@@ -1418,7 +1467,7 @@ function initLoginModal() {
   }
   const tokenInput = document.getElementById('directTokenInput');
   if (tokenInput && !tokenInput.value) {
-    tokenInput.value = AppState.authToken;
+    tokenInput.value = '';
   }
   const devIdInput = document.getElementById('directDeviceIdInput');
   if (devIdInput && !devIdInput.value) {
@@ -1966,6 +2015,21 @@ function initBotModeratorModule() {
 
       const isBotLoggedIn = data.isLoggedIn === true && data.authFailed !== true;
       const botName = (data.config && data.config.botName) ? data.config.botName : 'Átila';
+      AppState.botConnected = isBotLoggedIn;
+      AppState.botUser = isBotLoggedIn ? { id: data.config?.botUserId, name: botName } : null;
+
+      // Cabeçalho global deve refletir a sessão do robô imediatamente.
+      const globalBadge = document.getElementById('connectionModeBadge');
+      const globalText = document.getElementById('connectionModeText');
+      if (globalBadge && globalText) {
+        if (isBotLoggedIn) {
+          globalBadge.className = 'badge-status live';
+          globalText.textContent = `🟢 Robô conectado: ${botName}`;
+        } else {
+          globalBadge.className = 'badge-status disconnected';
+          globalText.textContent = '🔴 Robô não conectado';
+        }
+      }
       const botUserId = (data.config && data.config.botUserId) ? data.config.botUserId : '32037361';
 
       if (botAccountNameEl) botAccountNameEl.textContent = botName;
@@ -1982,7 +2046,28 @@ function initBotModeratorModule() {
           botAuthStatusPill.innerHTML = `<span>✅ CONECTADO (${escapeHtml(botName)})</span>`;
           botAuthStatusPill.title = 'Conta do Robô autenticada com sucesso no SuperLive';
           if (botOnlineIndicator) botOnlineIndicator.className = 'online-indicator active';
+          const sidebarOnlineIndicator = document.getElementById('sidebarOnlineIndicator');
+          if (sidebarOnlineIndicator) sidebarOnlineIndicator.className = 'online-indicator active';
           if (btnLogoutBotModal) btnLogoutBotModal.style.display = 'inline-block';
+        } else if (data.authState === 'unknown' && data.botAccount && data.botAccount.hasToken) {
+          botAuthStatusPill.className = 'badge-tag';
+          botAuthStatusPill.style.background = 'rgba(245, 158, 11, 0.16)';
+          botAuthStatusPill.style.color = '#fbbf24';
+          botAuthStatusPill.style.borderColor = 'rgba(245, 158, 11, 0.35)';
+          botAuthStatusPill.innerHTML = '<span>⏳ VALIDANDO SESSÃO...</span>';
+          botAuthStatusPill.title = 'Validando a sessão persistida do robô.';
+          if (botOnlineIndicator) botOnlineIndicator.className = 'online-indicator';
+        } else if (data.authState === 'invalid' || data.authFailed) {
+          botAuthStatusPill.className = 'badge-tag';
+          botAuthStatusPill.style.background = 'rgba(239, 68, 68, 0.2)';
+          botAuthStatusPill.style.color = '#f87171';
+          botAuthStatusPill.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+          botAuthStatusPill.innerHTML = '<span>⚠️ SESSÃO EXPIRADA</span>';
+          botAuthStatusPill.title = data.lastAuthError || 'A sessão do robô foi rejeitada pelo SuperLive. Faça login novamente.';
+          if (botOnlineIndicator) botOnlineIndicator.className = 'online-indicator';
+          const sidebarOnlineIndicator = document.getElementById('sidebarOnlineIndicator');
+          if (sidebarOnlineIndicator) sidebarOnlineIndicator.className = 'online-indicator';
+          if (btnLogoutBotModal) btnLogoutBotModal.style.display = 'none';
         } else {
           botAuthStatusPill.className = 'badge-tag';
           botAuthStatusPill.style.background = 'rgba(239, 68, 68, 0.2)';
@@ -1991,6 +2076,8 @@ function initBotModeratorModule() {
           botAuthStatusPill.innerHTML = `<span>⚠️ NÃO LOGADO (Clique para Login)</span>`;
           botAuthStatusPill.title = 'A conta do robô não está logada ou a sessão expirou. Clique para conectar.';
           if (botOnlineIndicator) botOnlineIndicator.className = 'online-indicator';
+          const sidebarOnlineIndicator = document.getElementById('sidebarOnlineIndicator');
+          if (sidebarOnlineIndicator) sidebarOnlineIndicator.className = 'online-indicator';
           if (btnLogoutBotModal) btnLogoutBotModal.style.display = 'none';
         }
       }
@@ -2218,6 +2305,11 @@ function initBotModeratorModule() {
   // 1. Iniciar / Pausar Moderação
   if (btnToggleMonitoring) {
     btnToggleMonitoring.addEventListener('click', async () => {
+      if (!botStatus.isMonitoring && !botStatus.isLoggedIn) {
+        showToast('Conecte a conta do robô antes de iniciar a moderação.', 'warning');
+        openLoginModal();
+        return;
+      }
       const endpoint = botStatus.isMonitoring ? '/api/bot/stop' : '/api/bot/start';
       try {
         const res = await fetch(endpoint, {

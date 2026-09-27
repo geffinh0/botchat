@@ -4,5 +4,9 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-data/*.tmp
+
+# Dados persistentes locais (contêm botToken, Device-ID, logs e criadoras reais)
+data/
+bot_config.json
+.env
 
