@@ -34,8 +34,9 @@ const DEFAULT_DB = {
     dmEnabled: true,
     dmTemplate: 'Live finalizada! Hoje você alcançou {viewers} espectadores e gerou {diamonds} diamantes na transmissão. Parabéns pelo show! ❤️',
     botToken: process.env.SUPERLIVE_BOT_TOKEN || '',
-    botUserId: '32037361',
-    botName: '𝑨́𝒕𝒊𝒍𝒂',
+    botUserId: '',
+    botName: '',
+    botSharedId: '',
     deviceId: process.env.SUPERLIVE_DEVICE_ID || ''
   },
   active_creator: null,

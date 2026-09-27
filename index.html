@@ -66,13 +66,13 @@
         <div class="account-pill" id="sidebarAccountPill" title="Clique para conectar ou gerenciar a conta do Robô" style="cursor:pointer;">
           <div class="user-avatar" id="sidebarAvatar" style="background: linear-gradient(135deg, #6366f1, #a855f7);">
             <span id="sidebarAvatarLetter">🤖</span>
-            <div class="online-indicator active" id="sidebarOnlineIndicator"></div>
+            <div class="online-indicator" id="sidebarOnlineIndicator"></div>
           </div>
           <div class="account-details">
-            <div class="account-name" id="sidebarUsername">𝑨́𝒕𝒊𝒍𝒂 (Robô Oficial)</div>
+            <div class="account-name" id="sidebarUsername">Não Conectado</div>
             <div class="account-meta" id="sidebarMeta">
-              <span>ID: <code id="sidebarSharedId" style="color:#a5b4fc;">32037361</code></span>
-              <span class="badge-tag live-badge" style="font-size:9px; padding:1px 5px;">ATIVO</span>
+              <span>ID: <code id="sidebarSharedId" style="color:#a5b4fc;">--</code></span>
+              <span class="badge-tag" id="sidebarStatusTag" style="font-size:9px; padding:1px 5px;">OFFLINE</span>
             </div>
           </div>
         </div>
@@ -112,15 +112,15 @@
               <div class="bot-account-info">
                 <div class="bot-avatar-container">
                   <span class="bot-avatar-icon">🤖</span>
-                  <div class="online-indicator active" id="botOnlineIndicator"></div>
+                  <div class="online-indicator" id="botOnlineIndicator"></div>
                 </div>
                 <div>
                   <div style="display:flex; align-items:center; gap:8px;">
-                    <h3 style="margin:0; font-size:18px; font-weight:800;">Conta Oficial do Robô: <span id="botAccountName" style="color:var(--accent);">𝑨́𝒕𝒊𝒍𝒂</span></h3>
+                    <h3 style="margin:0; font-size:18px; font-weight:800;">Conta Oficial do Robô: <span id="botAccountName" style="color:var(--accent);">Não Conectado</span></h3>
                     <span class="badge-tag" style="background:rgba(99,102,241,0.25); color:#a5b4fc; border:1px solid rgba(99,102,241,0.5); font-weight:700;">OFICIAL SUPER CLIENT</span>
                   </div>
                   <p style="margin:4px 0 0 0; font-size:13px; color:var(--text-secondary);">
-                    User ID: <code id="botAccountUserId" style="color:var(--text-primary); background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px;">32037361</code> | 
+                    User ID: <code id="botAccountUserId" style="color:var(--text-primary); background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px;">--</code> | 
                     Status WS: <span id="botWsStatusBadge" class="badge-tag" style="padding:2px 8px; font-size:11px; background:rgba(255,255,255,0.08); color:var(--text-secondary);">STANDBY</span> |
                     Operação: <span id="botStatusText" style="font-weight:700; color:var(--text-primary);">Aguardando sua Live</span>
                   </p>
@@ -163,14 +163,14 @@
                   <div class="bot-creator-avatar-preview" id="botCreatorAvatar">👤</div>
                   <div>
                     <div style="display:flex; align-items:center; gap:8px; margin-bottom:3px;">
-                      <span class="bot-creator-display-name" id="botCreatorDisplayName">Carregando Perfil...</span>
+                      <span class="bot-creator-display-name" id="botCreatorDisplayName">Nenhuma streamer conectada</span>
                       <div class="live-pill offline" id="botLiveBadgePill">
                         <span class="pulse-dot"></span>
                         <span id="botLiveBadgeText">OFFLINE (VIGILANTE)</span>
                       </div>
                     </div>
                     <div class="live-info-preview" id="botLiveInfoPreview">
-                      Robô pronto em Modo Vigilante. Inicie a live para conectar automaticamente.
+                      Digite o ID público ou nome da streamer acima para conectar.
                     </div>
                   </div>
                 </div>
@@ -404,7 +404,7 @@
                 <div class="dm-preview-bubble-container">
                   <div class="dm-preview-sender">
                     <span class="bot-avatar-icon" style="width:24px; height:24px; font-size:12px;">🤖</span>
-                    <strong style="color:var(--accent);">𝑨́𝒕𝒊𝒍𝒂 (Robô Oficial)</strong>
+                    <strong style="color:var(--accent);" id="botAccountOfficialLabel">Robô Moderador</strong>
                     <span style="font-size:10px; color:var(--text-muted); margin-left:auto;">Agora mesmo</span>
                   </div>
                   <div class="dm-preview-message" id="botDmPreviewText">

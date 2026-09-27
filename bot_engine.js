@@ -41,8 +41,9 @@ const DEFAULT_CONFIG = {
   dmTemplate: 'Live finalizada! Hoje você alcançou {viewers} espectadores e gerou {diamonds} diamantes na transmissão. Parabéns pelo show! ❤️',
   // Conta oficial do robô
   botToken: process.env.SUPERLIVE_BOT_TOKEN || '',
-  botUserId: '32037361',
-  botName: '𝑨́𝒕𝒊𝒍𝒂',
+  botUserId: '',
+  botName: '',
+  botSharedId: '',
   deviceId: process.env.SUPERLIVE_DEVICE_ID || 'e7a42524b5241eb9a73f28bc11b4f2ed'
 };
 
@@ -802,27 +803,33 @@ class BotEngine {
     let targetLiveId = null;
     let streamDetails = null;
 
-    // 1. Busca por users/search (busca exata por shared_id, user_id, username ou nome)
+    // 1. Busca por users/search (busca exata por shared_id publico, user_id, username ou nome)
     // Rota pública: consulta sem token para garantir que problemas na sessão do robô não afetem a busca
     try {
       const searchRes = await this.apiRequest('users/search', { search_query: raw }, true);
       if (searchRes && searchRes.items && searchRes.items.length > 0) {
-        // Correspondência exata prioritária por shared_id, user_id ou username
-        let match = searchRes.items.find(it => 
-          String(it.shared_id) === raw || 
-          String(it.user_id) === raw || 
-          (it.username && String(it.username).toLowerCase() === raw.toLowerCase())
-        );
+        // 1. Prioridade MÁXIMA: correspondência exata por shared_id (o ID público oficial)
+        let match = searchRes.items.find(it => String(it.shared_id || '').trim() === raw);
 
-        // Se a busca não for puramente numérica, tenta correspondência por nome
+        // 2. Correspondência exata por user_id interno
+        if (!match) {
+          match = searchRes.items.find(it => String(it.user_id || '').trim() === raw);
+        }
+
+        // 3. Correspondência exata por username (@handle)
+        if (!match) {
+          match = searchRes.items.find(it => it.username && String(it.username).toLowerCase().trim() === raw.toLowerCase());
+        }
+
+        // 4. Se a busca não for puramente numérica, tenta correspondência por nome
         if (!match && isNaN(Number(raw))) {
           match = searchRes.items.find(it => 
             it.name && it.name.toLowerCase().includes(raw.toLowerCase())
           );
         }
 
-        // Se ainda não encontrou correspondência estrita, usa o primeiro item retornado da busca
-        if (!match && searchRes.items.length > 0) {
+        // 5. Se houver apenas 1 resultado retornado da busca, usa-o
+        if (!match && searchRes.items.length === 1) {
           match = searchRes.items[0];
         }
 
@@ -837,16 +844,15 @@ class BotEngine {
       console.error('[BOT DETECT] Erro em users/search:', e.message);
     }
 
-    // 2. Se não encontrou, tenta users/profile diretamente caso seja ID de usuário
+    // 2. Se não encontrou, tenta users/profile (caso seja username ou user_id interno)
     if (!targetUser) {
       try {
-        const profRes = await this.apiRequest('users/profile', { user_id: raw }, true);
+        const body = isNaN(Number(raw)) ? { username: raw } : { user_id: raw };
+        const profRes = await this.apiRequest('users/profile', body, true);
         if (profRes && profRes.user && !profRes.error) {
-          if (String(profRes.user.user_id) === raw || String(profRes.user.shared_id) === raw) {
-            targetUser = profRes.user;
-            if (profRes.user.livestream_id) {
-              targetLiveId = String(profRes.user.livestream_id);
-            }
+          targetUser = profRes.user;
+          if (profRes.user.livestream_id) {
+            targetLiveId = String(profRes.user.livestream_id);
           }
         }
       } catch (e) {}
@@ -1388,8 +1394,9 @@ class BotEngine {
         this.authFailed = false;
         this.authState = 'valid';
         if (u.id || u.user_id) this.config.botUserId = String(u.id || u.user_id);
-        if (u.name || u.shared_id) this.config.botName = u.name || u.shared_id;
-        db.saveConfig({ botUserId: this.config.botUserId, botName: this.config.botName });
+        if (u.name || u.username || u.shared_id) this.config.botName = u.name || u.username || String(u.shared_id);
+        if (u.shared_id) this.config.botSharedId = String(u.shared_id);
+        db.saveConfig({ botUserId: this.config.botUserId, botName: this.config.botName, botSharedId: this.config.botSharedId });
         this.logSystem('API', 'SUCCESS', `Token persistido validado com sucesso para ${this.config.botName}.`);
         return true;
       }
@@ -1579,35 +1586,43 @@ class BotEngine {
     this.lastAuthAt = new Date().toISOString();
     this.lastAuthError = null;
 
-    let userName = this.config.botName || 'Robô';
+    let userName = '';
     let userSharedId = '';
+    let resolvedUserId = String(userId || '');
     let avatarUrl = '';
 
-    if (userData) {
-      userName = userData.name || userData.shared_id || userName;
-      userSharedId = userData.shared_id || '';
-      avatarUrl = (userData.profile_images && userData.profile_images[0] ? userData.profile_images[0].url : (userData.profile_image ? userData.profile_image.url : '')) || '';
-    } else {
-      try {
-        const pRes = await this.apiRequest('users/own_profile', {});
-        if (pRes && (pRes.user || pRes.id)) {
-          const u = pRes.user || pRes;
-          userName = u.name || u.shared_id || userName;
-          userId = u.id || u.user_id || userId;
-          userSharedId = u.shared_id || '';
-          avatarUrl = (u.profile_images && u.profile_images[0] ? u.profile_images[0].url : (u.profile_image ? u.profile_image.url : '')) || '';
-        }
-      } catch (e) {}
+    // Sempre tenta consultar o perfil oficial do token para obter os dados reais da conta
+    try {
+      const pRes = await this.apiRequest('users/own_profile', {});
+      const u = pRes?.user || pRes?.data?.user || pRes;
+      if (u && (u.id || u.user_id || u.name || u.shared_id)) {
+        userName = u.name || u.username || (u.shared_id ? String(u.shared_id) : '');
+        resolvedUserId = String(u.id || u.user_id || resolvedUserId);
+        userSharedId = String(u.shared_id || '');
+        avatarUrl = (u.profile_images && u.profile_images[0] ? u.profile_images[0].url : (u.profile_image ? u.profile_image.url : '')) || '';
+      }
+    } catch (e) {
+      console.warn('[AUTH] Aviso ao consultar users/own_profile:', e.message);
     }
 
-    if (userId) this.config.botUserId = String(userId);
+    if (!userName && userData) {
+      userName = userData.name || userData.username || (userData.shared_id ? String(userData.shared_id) : '');
+      if (!resolvedUserId) resolvedUserId = String(userData.id || userData.user_id || '');
+      if (!userSharedId) userSharedId = String(userData.shared_id || '');
+      if (!avatarUrl) avatarUrl = (userData.profile_images && userData.profile_images[0] ? userData.profile_images[0].url : (userData.profile_image ? userData.profile_image.url : '')) || '';
+    }
+
+    if (!userName) userName = 'Robô';
+    this.config.botUserId = resolvedUserId;
     this.config.botName = userName;
+    this.config.botSharedId = userSharedId;
 
     // Salva na persistência
     this.saveConfig({
       botToken: this.config.botToken,
       botUserId: this.config.botUserId,
       botName: this.config.botName,
+      botSharedId: this.config.botSharedId,
       deviceId: this.config.deviceId
     }, false);
 
@@ -1645,11 +1660,17 @@ class BotEngine {
   logoutBot() {
     this.authRevision++;
     this.config.botToken = '';
+    this.config.botUserId = '';
+    this.config.botName = '';
+    this.config.botSharedId = '';
     this.authFailed = false;
     this.authState = 'logged_out';
     this.lastAuthError = null;
     this.saveConfig({
-      botToken: ''
+      botToken: '',
+      botUserId: '',
+      botName: '',
+      botSharedId: ''
     }, false);
 
     if (this.ws) {
@@ -1670,8 +1691,9 @@ class BotEngine {
       authState: this.authState,
       isLoggedIn: isAuth,
       botAccount: {
-        userId: this.config.botUserId,
-        name: this.config.botName,
+        userId: isAuth ? (this.config.botUserId || '') : '',
+        sharedId: isAuth ? (this.config.botSharedId || '') : '',
+        name: isAuth ? (this.config.botName || '') : '',
         hasToken: hasToken,
         isAuth: isAuth
       },

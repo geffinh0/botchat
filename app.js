@@ -165,6 +165,10 @@ async function apiCall(endpoint, method = 'POST', bodyData = {}) {
     'Device-ID': AppState.deviceId
   };
 
+  if (AppState.authToken) {
+    headers['Authorization'] = `Token ${AppState.authToken}`;
+  }
+
 
   const reqOptions = {
     method,
@@ -255,9 +259,10 @@ async function validateAndLoadAccount(options = {}) {
       AppState.diamondsBalance = profile.diamonds || 0;
       AppState.coinsBalance = profile.coins || 0;
 
-      updateAuthUI(true, profile.name || 'Átila');
+      const finalName = profile.name || profile.username || 'Robô';
+      updateAuthUI(true, finalName);
       if (!silent) {
-        showToast(`Bem-vindo, ${profile.name || 'Átila'}! Conta conectada com sucesso.`, 'success');
+        showToast(`Bem-vindo, ${finalName}! Conta conectada com sucesso.`, 'success');
       }
     } else {
       const msg = res.data?.error?.message || 'Não foi possível carregar o perfil da conta agora.';
@@ -657,8 +662,8 @@ function updateAuthUI(isLoggedIn, username = '') {
 
   if (isLoggedIn) {
     const p = AppState.userProfile || AppState.botUser || {};
-    const displayName = p.name || username || 'Robô';
-    const id = p.shared_id || p.user_id || p.id || '32037361';
+    const displayName = p.name || p.username || username || 'Robô';
+    const id = p.shared_id || p.user_id || p.id || '--';
 
     if (badge) badge.className = 'badge-status live';
     if (text) text.textContent = `🟢 Robô Conectado: ${displayName}`;
@@ -744,7 +749,10 @@ function updateAuthUI(isLoggedIn, username = '') {
     if (text) text.textContent = '🔴 Robô não conectado';
     if (actionBtn) actionBtn.innerHTML = '<span>🔑 Conectar Conta</span>';
 
-    if (sidebarUsername) sidebarUsername.textContent = 'Nenhuma Conta';
+    if (sidebarUsername) sidebarUsername.textContent = 'Não Conectado';
+    if (sidebarSharedId) sidebarSharedId.textContent = '--';
+    if (botAccountName) botAccountName.textContent = 'Não Conectado';
+    if (botAccountUserId) botAccountUserId.textContent = '--';
     if (sidebarLevelText) sidebarLevelText.textContent = 'Toque para conectar';
     if (btnCopyUserId) btnCopyUserId.style.display = 'none';
     if (sidebarAvatarLetter) {
@@ -1539,10 +1547,10 @@ function initLoginModal() {
     });
   }
 
-  // Pre-fill email and token inputs with user credentials
+  // Input de email limpo por padrão (sem credenciais pré-preenchidas)
   const emailInput = document.getElementById('loginEmail');
   if (emailInput && !emailInput.value) {
-    emailInput.value = 'contato.gefferson@hotmail.com';
+    emailInput.value = '';
   }
   const tokenInput = document.getElementById('directTokenInput');
   if (tokenInput && !tokenInput.value) {
@@ -1789,8 +1797,9 @@ function initBotModeratorModule() {
     dmEnabled: true,
     dmTemplate: 'Live finalizada! Hoje você alcançou {viewers} espectadores e gerou {diamonds} diamantes na transmissão. Parabéns pelo show! ❤️',
     botToken: '',
-    botUserId: '32037361',
-    botName: '𝑨́𝒕𝒊𝒍𝒂',
+    botUserId: '',
+    botName: '',
+    botSharedId: '',
     deviceId: 'e7a42524b5241eb9a73f28bc11b4f2ed'
   };
 
@@ -2106,9 +2115,11 @@ function initBotModeratorModule() {
       const btnLogoutBotModal = document.getElementById('btnLogoutBotModal');
 
       const isBotLoggedIn = data.isLoggedIn === true && data.authFailed !== true;
-      const botName = (data.config && data.config.botName) ? data.config.botName : 'Átila';
+      const botAccount = data.botAccount || {};
+      const botName = isBotLoggedIn ? (botAccount.name || data.config?.botName || 'Robô') : 'Não Conectado';
+      const botUserId = isBotLoggedIn ? (botAccount.sharedId || botAccount.userId || data.config?.botSharedId || data.config?.botUserId || '--') : '--';
       AppState.botConnected = isBotLoggedIn;
-      AppState.botUser = isBotLoggedIn ? { id: data.config?.botUserId, name: botName } : null;
+      AppState.botUser = isBotLoggedIn ? { id: botUserId, name: botName } : null;
 
       // Cabeçalho global deve refletir a sessão do robô imediatamente.
       const globalBadge = document.getElementById('connectionModeBadge');
@@ -2122,11 +2133,10 @@ function initBotModeratorModule() {
           globalText.textContent = '🔴 Robô não conectado';
         }
       }
-      const botUserId = (data.config && data.config.botUserId) ? data.config.botUserId : '32037361';
 
       if (botAccountNameEl) botAccountNameEl.textContent = botName;
       if (botAccountUserIdEl) botAccountUserIdEl.textContent = botUserId;
-      if (sidebarUsername) sidebarUsername.textContent = `${botName} (Robô Oficial)`;
+      if (sidebarUsername) sidebarUsername.textContent = isBotLoggedIn ? `${botName} (Robô Oficial)` : 'Não Conectado';
       if (sidebarSharedId) sidebarSharedId.textContent = botUserId;
 
       if (botAuthStatusPill) {

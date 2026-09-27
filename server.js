@@ -180,7 +180,7 @@ const server = http.createServer(async (req, res) => {
           targetPath === '/api/v1/users/search' ||
           targetPath === '/api/v1/users/profile' ||
           targetPath === '/api/v1/livestream/retrieve';
-        const serverToken = botEngine && botEngine.config && botEngine.config.botToken && !botEngine.authFailed;
+        const serverToken = (botEngine && botEngine.config && !botEngine.authFailed) ? (botEngine.config.botToken || '') : '';
         if (!isPublicRoute && serverToken) {
           proxyHeaders['Authorization'] = `Token ${serverToken}`;
         }
