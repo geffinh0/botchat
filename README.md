@@ -52,3 +52,17 @@ Acesse no navegador: `http://localhost:3000`
 6. Clique no botão **"Create Web Service"**.
 7. Em cerca de 30 a 60 segundos o Render irá gerar uma URL pública segura (ex: `https://superclient-bot.onrender.com`).
 8. Pronto! Agora qualquer pessoa autorizada ou você mesmo pode acessar o robô e testar de qualquer lugar (computador, celular ou tablet).
+
+### 🔎 Configuração recomendada de Health Check no Render
+
+O servidor aceita a porta fornecida automaticamente pelo Render através de `process.env.PORT` e faz bind em `0.0.0.0`. Não é necessário definir `PORT=3000` no Render.
+
+No painel do Web Service, em **Health Check Path**, use:
+
+```text
+/healthz
+```
+
+Esse endpoint retorna HTTP `200` enquanto o processo HTTP estiver ativo e pode ser usado pelo Render para verificar a saúde do serviço.
+
+O servidor também registra explicitamente as etapas de inicialização no log e trata `SIGTERM`, `uncaughtException`, `unhandledRejection` e erros do listener HTTP para facilitar o diagnóstico de falhas de deploy.

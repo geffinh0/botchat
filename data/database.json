@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "last_updated": "2026-09-27T14:06:01.019Z",
+  "last_updated": "2026-09-27T14:23:33.740Z",
   "config": {
     "creatorUserId": "69622983",
     "livestreamId": "",
@@ -182,9 +182,36 @@
   ],
   "system_logs": [
     {
-      "id": "sys-1790517960993-q1xw",
-      "timestamp": "11:06:00",
-      "isoTime": "2026-09-27T14:06:01.019Z",
+      "id": "sys-1790519013740-ewc0",
+      "timestamp": "14:23:33",
+      "isoTime": "2026-09-27T14:23:33.740Z",
+      "category": "API",
+      "level": "WARN",
+      "message": "Não foi possível validar a sessão agora: getaddrinfo EAI_AGAIN api.sprlv-api.com",
+      "details": null
+    },
+    {
+      "id": "sys-1790519013385-3vyn",
+      "timestamp": "14:23:33",
+      "isoTime": "2026-09-27T14:23:33.396Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790518980083-8191",
+      "timestamp": "14:23:00",
+      "isoTime": "2026-09-27T14:23:00.083Z",
+      "category": "API",
+      "level": "WARN",
+      "message": "Não foi possível validar a sessão agora: getaddrinfo EAI_AGAIN api.sprlv-api.com",
+      "details": null
+    },
+    {
+      "id": "sys-1790518979728-b7l2",
+      "timestamp": "14:22:59",
+      "isoTime": "2026-09-27T14:22:59.740Z",
       "category": "SYSTEM",
       "level": "INFO",
       "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
@@ -4649,33 +4676,6 @@
       "id": "sys-1790469563301-v04u",
       "timestamp": "21:39:23",
       "isoTime": "2026-09-27T00:39:23.301Z",
-      "category": "WS",
-      "level": "INFO",
-      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
-      "details": null
-    },
-    {
-      "id": "sys-1790469561285-s86f",
-      "timestamp": "21:39:21",
-      "isoTime": "2026-09-27T00:39:21.285Z",
-      "category": "WS",
-      "level": "WARN",
-      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
-      "details": null
-    },
-    {
-      "id": "sys-1790469555505-i6be",
-      "timestamp": "21:39:15",
-      "isoTime": "2026-09-27T00:39:15.505Z",
-      "category": "WS",
-      "level": "SUCCESS",
-      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
-      "details": null
-    },
-    {
-      "id": "sys-1790469554929-nfxw",
-      "timestamp": "21:39:14",
-      "isoTime": "2026-09-27T00:39:14.929Z",
       "category": "WS",
       "level": "INFO",
       "message": "Iniciando conexão WebSocket oficial (Device-ID)...",

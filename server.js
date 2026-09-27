@@ -5,13 +5,30 @@
  * complete mobile headers, eliminating CORS restrictions in web browsers.
  */
 
+console.log('[BOOT] Iniciando Super Client Server...');
+console.log(`[BOOT] Node.js ${process.version} | PID ${process.pid}`);
+
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
-const botEngine = require('./bot_engine');
-const db = require('./db');
+
+let botEngine;
+let db;
+try {
+  console.log('[BOOT] Carregando banco de dados...');
+  db = require('./db');
+  console.log('[BOOT] Banco de dados carregado.');
+
+  console.log('[BOOT] Carregando engine do bot...');
+  botEngine = require('./bot_engine');
+  console.log('[BOOT] Engine do bot carregada.');
+} catch (err) {
+  console.error('[BOOT][FATAL] Falha ao carregar dependências da aplicação.');
+  console.error(err && err.stack ? err.stack : err);
+  process.exit(1);
+}
 
 function readJsonBody(req) {
   return new Promise((resolve) => {
@@ -28,7 +45,13 @@ function readJsonBody(req) {
   });
 }
 
-const PORT = process.env.PORT || 3000;
+const rawPort = process.env.PORT || '3000';
+const PORT = Number(rawPort);
+if (!Number.isInteger(PORT) || PORT <= 0 || PORT > 65535) {
+  console.error(`[BOOT][FATAL] PORT inválida: ${rawPort}`);
+  process.exit(1);
+}
+const HOST = '0.0.0.0';
 const STATIC_DIR = __dirname;
 const REMOTE_API_HOST = 'api.sprlv-api.com';
 const REMOTE_API_BASE_PATH = '/api/v1';
@@ -460,6 +483,17 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  // --- Render / uptime health check ---
+  if (pathname === '/healthz' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=UTF-8', 'Cache-Control': 'no-store' });
+    res.end(JSON.stringify({
+      status: 'ok',
+      uptime: process.uptime(),
+      version: '2.31.0'
+    }));
+    return;
+  }
+
   // --- Proxy Status & Device Registration Endpoint ---
   if (pathname === '/server-status') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -501,11 +535,56 @@ const server = http.createServer(async (req, res) => {
   });
 });
 
-server.listen(PORT, () => {
+let shuttingDown = false;
+
+function shutdown(signal) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log(`[SHUTDOWN] Recebido ${signal}. Encerrando servidor...`);
+
+  server.close((err) => {
+    if (err) {
+      console.error('[SHUTDOWN] Erro ao fechar o servidor:', err);
+      process.exitCode = 1;
+      return;
+    }
+    console.log('[SHUTDOWN] Servidor encerrado com sucesso.');
+    process.exit(0);
+  });
+
+  setTimeout(() => {
+    console.error('[SHUTDOWN] Encerramento forçado após timeout.');
+    process.exit(1);
+  }, 10000).unref();
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('uncaughtException', (err) => {
+  console.error('[PROCESS][FATAL] Uncaught exception:');
+  console.error(err && err.stack ? err.stack : err);
+  process.exit(1);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[PROCESS][FATAL] Unhandled rejection:');
+  console.error(reason && reason.stack ? reason.stack : reason);
+  process.exit(1);
+});
+
+console.log(`[BOOT] Preparando listener HTTP em ${HOST}:${PORT}...`);
+
+server.on('error', (err) => {
+  console.error('[HTTP][FATAL] Falha ao iniciar o listener HTTP:');
+  console.error(err && err.stack ? err.stack : err);
+  process.exit(1);
+});
+
+server.listen(PORT, HOST, () => {
   console.log('=====================================================');
-  console.log(`🚀 SUPER CLIENT SERVER EM EXECUÇÃO!`);
-  console.log(`🌐 Painel Web: http://localhost:${PORT}`);
-  console.log(`🔌 Proxy SuperLive API: http://localhost:${PORT}/api/v1/`);
-  console.log(`📱 Device-ID Padrão: ${cachedDeviceId}`);
+  console.log('🚀 SUPER CLIENT SERVER EM EXECUÇÃO!');
+  console.log(`🌐 Bind: http://${HOST}:${PORT}`);
+  console.log(`🔌 Proxy SuperLive API: /api/v1/`);
+  console.log(`📱 Device-ID: ${cachedDeviceId}`);
+  console.log(`❤️ Health check: /healthz`);
   console.log('=====================================================');
 });
