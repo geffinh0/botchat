@@ -174,9 +174,14 @@ const server = http.createServer(async (req, res) => {
       if (req.headers['authorization']) {
         proxyHeaders['Authorization'] = req.headers['authorization'];
       } else {
-        const isPublicAuthRoute = targetPath === '/api/v1/device/register' || targetPath.startsWith('/api/v1/user/signup/');
-        const serverToken = botEngine && botEngine.config && botEngine.config.botToken;
-        if (!isPublicAuthRoute && serverToken) {
+        const isPublicRoute = 
+          targetPath === '/api/v1/device/register' || 
+          targetPath.startsWith('/api/v1/user/signup/') ||
+          targetPath === '/api/v1/users/search' ||
+          targetPath === '/api/v1/users/profile' ||
+          targetPath === '/api/v1/livestream/retrieve';
+        const serverToken = botEngine && botEngine.config && botEngine.config.botToken && !botEngine.authFailed;
+        if (!isPublicRoute && serverToken) {
           proxyHeaders['Authorization'] = `Token ${serverToken}`;
         }
       }

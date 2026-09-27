@@ -43,7 +43,7 @@ const DEFAULT_CONFIG = {
   botToken: process.env.SUPERLIVE_BOT_TOKEN || '',
   botUserId: '32037361',
   botName: '𝑨́𝒕𝒊𝒍𝒂',
-  deviceId: process.env.SUPERLIVE_DEVICE_ID || ''
+  deviceId: process.env.SUPERLIVE_DEVICE_ID || 'e7a42524b5241eb9a73f28bc11b4f2ed'
 };
 
 class BotEngine {
@@ -152,11 +152,13 @@ class BotEngine {
     return new Promise((resolve, reject) => {
       const payload = JSON.stringify(body);
       const isAuthExempt = apiPath.startsWith('user/signup/');
+      const defaultDeviceId = 'e7a42524b5241eb9a73f28bc11b4f2ed';
+      const deviceId = this.config.deviceId || defaultDeviceId;
       const headers = {
         'Content-Type': 'application/json; charset=UTF-8',
         'Accept': 'application/json',
         'User-Agent': 'SuperLive/2.31.0 (samsung SM-G998B; Android 13; Scale/3.0)',
-        'Device-ID': this.config.deviceId,
+        'Device-ID': deviceId,
         'Content-Length': Buffer.byteLength(payload)
       };
 
@@ -176,9 +178,26 @@ class BotEngine {
         res.on('end', () => {
           try {
             const json = JSON.parse(data);
-            if (json && json.error && (json.error.code === '2' || json.error.code === 2 || String(json.error.message).includes('logged out'))) {
+            const errCode = json?.error?.code;
+            const errMsg = String(json?.error?.message || '').toLowerCase();
+            const isAuthError = json && json.error && (
+              errCode === 77 || errCode === '77' ||
+              errCode === 2 || errCode === '2' ||
+              errCode === 78 || errCode === '78' ||
+              errCode === 401 || errCode === '401' ||
+              res.statusCode === 401 ||
+              errMsg.includes('unknown urd') ||
+              errMsg.includes('logged out') ||
+              errMsg.includes('invalid token') ||
+              errMsg.includes('token expired') ||
+              errMsg.includes('not logged in')
+            );
+
+            if (isAuthError && !forceNoToken) {
               this.authFailed = true;
-              console.warn(`[BOT API] Token expirado detectado na rota ${apiPath}. Retentando imediatamente em Modo Device-ID...`);
+              this.authState = 'invalid';
+              this.lastAuthError = json?.error?.message || 'Token expirado ou inválido (código 77/2).';
+              console.warn(`[BOT API] Token rejeitado (${json.error?.message || json.error?.code}) na rota ${apiPath}. Retentando imediatamente em Modo Device-ID sem token...`);
               return this.apiRequest(apiPath, body, true).then(resolve).catch(reject);
             }
             resolve(json);
@@ -784,8 +803,9 @@ class BotEngine {
     let streamDetails = null;
 
     // 1. Busca por users/search (busca exata por shared_id, user_id, username ou nome)
+    // Rota pública: consulta sem token para garantir que problemas na sessão do robô não afetem a busca
     try {
-      const searchRes = await this.apiRequest('users/search', { search_query: raw });
+      const searchRes = await this.apiRequest('users/search', { search_query: raw }, true);
       if (searchRes && searchRes.items && searchRes.items.length > 0) {
         // Correspondência exata prioritária por shared_id, user_id ou username
         let match = searchRes.items.find(it => 
@@ -820,7 +840,7 @@ class BotEngine {
     // 2. Se não encontrou, tenta users/profile diretamente caso seja ID de usuário
     if (!targetUser) {
       try {
-        const profRes = await this.apiRequest('users/profile', { user_id: raw });
+        const profRes = await this.apiRequest('users/profile', { user_id: raw }, true);
         if (profRes && profRes.user && !profRes.error) {
           if (String(profRes.user.user_id) === raw || String(profRes.user.shared_id) === raw) {
             targetUser = profRes.user;
@@ -835,7 +855,7 @@ class BotEngine {
     // 3. Se ainda não encontrou como usuário, verifica se é o ID de uma live ativa em andamento
     if (!targetUser) {
       try {
-        const liveRes = await this.apiRequest('livestream/retrieve', { livestream_id: raw });
+        const liveRes = await this.apiRequest('livestream/retrieve', { livestream_id: raw }, true);
         if (liveRes && !liveRes.error && liveRes.stream_details) {
           const sd = liveRes.stream_details;
           const u = liveRes.user || {};
@@ -853,7 +873,7 @@ class BotEngine {
     if (targetUser) {
       const internalId = String(targetUser.user_id);
       try {
-        const fullProf = await this.apiRequest('users/profile', { user_id: internalId });
+        const fullProf = await this.apiRequest('users/profile', { user_id: internalId }, true);
         if (fullProf && fullProf.user && !fullProf.error) {
           targetUser = { ...targetUser, ...fullProf.user };
           if (fullProf.user.livestream_id) {
@@ -865,7 +885,7 @@ class BotEngine {
       // Se há um livestream_id ativo, obtém stream_details atualizados
       if (targetLiveId && !streamDetails) {
         try {
-          const liveRes = await this.apiRequest('livestream/retrieve', { livestream_id: targetLiveId });
+          const liveRes = await this.apiRequest('livestream/retrieve', { livestream_id: targetLiveId }, true);
           if (liveRes && liveRes.stream_details && !liveRes.stream_details.finished_at) {
             streamDetails = liveRes.stream_details;
           } else if (liveRes && liveRes.stream_details && liveRes.stream_details.finished_at) {
