@@ -1,8 +1,8 @@
 {
   "version": "2.0.0",
-  "last_updated": "2026-09-27T00:19:55.720Z",
+  "last_updated": "2026-09-27T00:42:01.117Z",
   "config": {
-    "creatorUserId": "35729338",
+    "creatorUserId": "91513136",
     "livestreamId": "151690318",
     "autoDetectLive": true,
     "moderationEnabled": false,
@@ -38,17 +38,17 @@
     "recurringMessages": []
   },
   "active_creator": {
-    "userId": "26850812",
-    "sharedId": "35729338",
-    "name": "♡🌜LUA🌛♡",
-    "username": "luazinha",
-    "avatar": "https://cdn.sprlv-api.com/pp/26850812/33505cd567041df330929afa075752c1_b",
-    "diamonds": 1452791,
-    "followers": 224441,
+    "userId": "11636523",
+    "sharedId": "91513136",
+    "name": "🔥🕹️Raquel🔥⚜️",
+    "username": "raqqquel",
+    "avatar": "https://cdn.sprlv-api.com/pp/11636523/fc22ffe20d45d232c34b9a3d8ae80748_b",
+    "diamonds": 0,
+    "followers": 0,
     "isLive": false,
     "livestreamId": null,
     "headline": "Live ao Vivo",
-    "lastSeen": "2026-09-27T00:19:55.720Z",
+    "lastSeen": "2026-09-27T00:27:01.795Z",
     "liveFound": false,
     "viewers": 0,
     "is_modded": false
@@ -99,6 +99,22 @@
     "exactMatch": false
   },
   "creators": {
+    "11636523": {
+      "userId": "11636523",
+      "sharedId": "91513136",
+      "name": "🔥🕹️Raquel🔥⚜️",
+      "username": "raqqquel",
+      "avatar": "https://cdn.sprlv-api.com/pp/11636523/fc22ffe20d45d232c34b9a3d8ae80748_b",
+      "diamonds": 0,
+      "followers": 0,
+      "isLive": false,
+      "livestreamId": null,
+      "headline": "Live ao Vivo",
+      "lastSeen": "2026-09-27T00:27:01.795Z",
+      "liveFound": false,
+      "viewers": 0,
+      "is_modded": false
+    },
     "26850812": {
       "userId": "26850812",
       "sharedId": "35729338",
@@ -110,7 +126,7 @@
       "isLive": false,
       "livestreamId": null,
       "headline": "Live ao Vivo",
-      "lastSeen": "2026-09-27T00:19:55.720Z",
+      "lastSeen": "2026-09-27T00:20:51.501Z",
       "liveFound": false,
       "viewers": 0,
       "is_modded": false
@@ -118,6 +134,2886 @@
   },
   "audit_logs": [],
   "system_logs": [
+    {
+      "id": "sys-1790469721117-eov9",
+      "timestamp": "21:42:01",
+      "isoTime": "2026-09-27T00:42:01.117Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469713577-vntu",
+      "timestamp": "21:41:53",
+      "isoTime": "2026-09-27T00:41:53.577Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469712987-zhs5",
+      "timestamp": "21:41:52",
+      "isoTime": "2026-09-27T00:41:52.987Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469710974-649u",
+      "timestamp": "21:41:50",
+      "isoTime": "2026-09-27T00:41:50.974Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469705031-ehiq",
+      "timestamp": "21:41:45",
+      "isoTime": "2026-09-27T00:41:45.032Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469704446-cbkd",
+      "timestamp": "21:41:44",
+      "isoTime": "2026-09-27T00:41:44.446Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469702433-qk7i",
+      "timestamp": "21:41:42",
+      "isoTime": "2026-09-27T00:41:42.433Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469694832-9f6x",
+      "timestamp": "21:41:34",
+      "isoTime": "2026-09-27T00:41:34.832Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469694252-y2s8",
+      "timestamp": "21:41:34",
+      "isoTime": "2026-09-27T00:41:34.252Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469692242-uomb",
+      "timestamp": "21:41:32",
+      "isoTime": "2026-09-27T00:41:32.242Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469686243-109s",
+      "timestamp": "21:41:26",
+      "isoTime": "2026-09-27T00:41:26.243Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469685677-614n",
+      "timestamp": "21:41:25",
+      "isoTime": "2026-09-27T00:41:25.677Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469683669-xm0w",
+      "timestamp": "21:41:23",
+      "isoTime": "2026-09-27T00:41:23.669Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469675930-otgm",
+      "timestamp": "21:41:15",
+      "isoTime": "2026-09-27T00:41:15.930Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469675350-9and",
+      "timestamp": "21:41:15",
+      "isoTime": "2026-09-27T00:41:15.350Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469673341-yt68",
+      "timestamp": "21:41:13",
+      "isoTime": "2026-09-27T00:41:13.341Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469667527-r3pn",
+      "timestamp": "21:41:07",
+      "isoTime": "2026-09-27T00:41:07.527Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469666941-m552",
+      "timestamp": "21:41:06",
+      "isoTime": "2026-09-27T00:41:06.941Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469664933-4998",
+      "timestamp": "21:41:04",
+      "isoTime": "2026-09-27T00:41:04.933Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469657195-bu4e",
+      "timestamp": "21:40:57",
+      "isoTime": "2026-09-27T00:40:57.195Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469656631-hwpy",
+      "timestamp": "21:40:56",
+      "isoTime": "2026-09-27T00:40:56.631Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469654615-gpbn",
+      "timestamp": "21:40:54",
+      "isoTime": "2026-09-27T00:40:54.615Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469648778-kem6",
+      "timestamp": "21:40:48",
+      "isoTime": "2026-09-27T00:40:48.778Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469648208-i5da",
+      "timestamp": "21:40:48",
+      "isoTime": "2026-09-27T00:40:48.208Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469646201-zvp5",
+      "timestamp": "21:40:46",
+      "isoTime": "2026-09-27T00:40:46.201Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469638492-9unq",
+      "timestamp": "21:40:38",
+      "isoTime": "2026-09-27T00:40:38.492Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469637911-58yp",
+      "timestamp": "21:40:37",
+      "isoTime": "2026-09-27T00:40:37.911Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469635892-ofdk",
+      "timestamp": "21:40:35",
+      "isoTime": "2026-09-27T00:40:35.892Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469630071-6qyh",
+      "timestamp": "21:40:30",
+      "isoTime": "2026-09-27T00:40:30.071Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469629503-je2f",
+      "timestamp": "21:40:29",
+      "isoTime": "2026-09-27T00:40:29.504Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469627491-ftc1",
+      "timestamp": "21:40:27",
+      "isoTime": "2026-09-27T00:40:27.491Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469619696-20ye",
+      "timestamp": "21:40:19",
+      "isoTime": "2026-09-27T00:40:19.696Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469619109-zvc7",
+      "timestamp": "21:40:19",
+      "isoTime": "2026-09-27T00:40:19.109Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469617095-c7a9",
+      "timestamp": "21:40:17",
+      "isoTime": "2026-09-27T00:40:17.095Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469609266-1mlt",
+      "timestamp": "21:40:09",
+      "isoTime": "2026-09-27T00:40:09.266Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469608681-hvfi",
+      "timestamp": "21:40:08",
+      "isoTime": "2026-09-27T00:40:08.681Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469606671-pf0m",
+      "timestamp": "21:40:06",
+      "isoTime": "2026-09-27T00:40:06.671Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469600748-arsx",
+      "timestamp": "21:40:00",
+      "isoTime": "2026-09-27T00:40:00.748Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469600141-jpfq",
+      "timestamp": "21:40:00",
+      "isoTime": "2026-09-27T00:40:00.141Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469598127-xayg",
+      "timestamp": "21:39:58",
+      "isoTime": "2026-09-27T00:39:58.127Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469590368-1ubo",
+      "timestamp": "21:39:50",
+      "isoTime": "2026-09-27T00:39:50.368Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469589780-nczi",
+      "timestamp": "21:39:49",
+      "isoTime": "2026-09-27T00:39:49.780Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469587769-zlmr",
+      "timestamp": "21:39:47",
+      "isoTime": "2026-09-27T00:39:47.769Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469581964-kzaa",
+      "timestamp": "21:39:41",
+      "isoTime": "2026-09-27T00:39:41.964Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469581372-vivf",
+      "timestamp": "21:39:41",
+      "isoTime": "2026-09-27T00:39:41.372Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469579361-mqqb",
+      "timestamp": "21:39:39",
+      "isoTime": "2026-09-27T00:39:39.362Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469571621-gb9l",
+      "timestamp": "21:39:31",
+      "isoTime": "2026-09-27T00:39:31.621Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469571028-mpdo",
+      "timestamp": "21:39:31",
+      "isoTime": "2026-09-27T00:39:31.029Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469569023-ga3h",
+      "timestamp": "21:39:29",
+      "isoTime": "2026-09-27T00:39:29.023Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469563208-e2ot",
+      "timestamp": "21:39:23",
+      "isoTime": "2026-09-27T00:39:23.208Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469562636-yl3q",
+      "timestamp": "21:39:22",
+      "isoTime": "2026-09-27T00:39:22.636Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469560624-65dc",
+      "timestamp": "21:39:20",
+      "isoTime": "2026-09-27T00:39:20.624Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469552817-m8cb",
+      "timestamp": "21:39:12",
+      "isoTime": "2026-09-27T00:39:12.817Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469552228-zulm",
+      "timestamp": "21:39:12",
+      "isoTime": "2026-09-27T00:39:12.228Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469550211-dqne",
+      "timestamp": "21:39:10",
+      "isoTime": "2026-09-27T00:39:10.212Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469544500-qu00",
+      "timestamp": "21:39:04",
+      "isoTime": "2026-09-27T00:39:04.500Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469543924-jjdi",
+      "timestamp": "21:39:03",
+      "isoTime": "2026-09-27T00:39:03.924Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469541912-6g6e",
+      "timestamp": "21:39:01",
+      "isoTime": "2026-09-27T00:39:01.912Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469534010-jc3m",
+      "timestamp": "21:38:54",
+      "isoTime": "2026-09-27T00:38:54.010Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469533409-m36d",
+      "timestamp": "21:38:53",
+      "isoTime": "2026-09-27T00:38:53.409Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469531391-klgn",
+      "timestamp": "21:38:51",
+      "isoTime": "2026-09-27T00:38:51.391Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469523539-75fy",
+      "timestamp": "21:38:43",
+      "isoTime": "2026-09-27T00:38:43.539Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469522948-jh8a",
+      "timestamp": "21:38:42",
+      "isoTime": "2026-09-27T00:38:42.948Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469520938-bms1",
+      "timestamp": "21:38:40",
+      "isoTime": "2026-09-27T00:38:40.938Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469515036-ywmw",
+      "timestamp": "21:38:35",
+      "isoTime": "2026-09-27T00:38:35.036Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469514463-6ius",
+      "timestamp": "21:38:34",
+      "isoTime": "2026-09-27T00:38:34.463Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469512454-tzw0",
+      "timestamp": "21:38:32",
+      "isoTime": "2026-09-27T00:38:32.454Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469504776-caaa",
+      "timestamp": "21:38:24",
+      "isoTime": "2026-09-27T00:38:24.776Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469504211-nyxj",
+      "timestamp": "21:38:24",
+      "isoTime": "2026-09-27T00:38:24.211Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469502197-n3tb",
+      "timestamp": "21:38:22",
+      "isoTime": "2026-09-27T00:38:22.198Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469496303-1nzo",
+      "timestamp": "21:38:16",
+      "isoTime": "2026-09-27T00:38:16.303Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469495733-ch43",
+      "timestamp": "21:38:15",
+      "isoTime": "2026-09-27T00:38:15.733Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469493715-maz7",
+      "timestamp": "21:38:13",
+      "isoTime": "2026-09-27T00:38:13.715Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469486117-4l9t",
+      "timestamp": "21:38:06",
+      "isoTime": "2026-09-27T00:38:06.117Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469485530-lke1",
+      "timestamp": "21:38:05",
+      "isoTime": "2026-09-27T00:38:05.530Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469483524-rvau",
+      "timestamp": "21:38:03",
+      "isoTime": "2026-09-27T00:38:03.524Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469477575-77hm",
+      "timestamp": "21:37:57",
+      "isoTime": "2026-09-27T00:37:57.575Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469476979-rm56",
+      "timestamp": "21:37:56",
+      "isoTime": "2026-09-27T00:37:56.979Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469474962-jw7l",
+      "timestamp": "21:37:54",
+      "isoTime": "2026-09-27T00:37:54.962Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469467327-iol4",
+      "timestamp": "21:37:47",
+      "isoTime": "2026-09-27T00:37:47.327Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469466756-q4z8",
+      "timestamp": "21:37:46",
+      "isoTime": "2026-09-27T00:37:46.757Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469464738-8ntc",
+      "timestamp": "21:37:44",
+      "isoTime": "2026-09-27T00:37:44.738Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469458578-eg67",
+      "timestamp": "21:37:38",
+      "isoTime": "2026-09-27T00:37:38.578Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469457993-m4bc",
+      "timestamp": "21:37:37",
+      "isoTime": "2026-09-27T00:37:37.993Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469455979-fhxt",
+      "timestamp": "21:37:35",
+      "isoTime": "2026-09-27T00:37:35.979Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469448598-pnw5",
+      "timestamp": "21:37:28",
+      "isoTime": "2026-09-27T00:37:28.598Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469448038-qg9c",
+      "timestamp": "21:37:28",
+      "isoTime": "2026-09-27T00:37:28.038Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469446030-j2nv",
+      "timestamp": "21:37:26",
+      "isoTime": "2026-09-27T00:37:26.030Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469439833-9rfy",
+      "timestamp": "21:37:19",
+      "isoTime": "2026-09-27T00:37:19.833Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469439264-picl",
+      "timestamp": "21:37:19",
+      "isoTime": "2026-09-27T00:37:19.265Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469437249-ba5u",
+      "timestamp": "21:37:17",
+      "isoTime": "2026-09-27T00:37:17.249Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469432674-7amu",
+      "timestamp": "21:37:12",
+      "isoTime": "2026-09-27T00:37:12.674Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469432099-o8ee",
+      "timestamp": "21:37:12",
+      "isoTime": "2026-09-27T00:37:12.099Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469430093-3jgi",
+      "timestamp": "21:37:10",
+      "isoTime": "2026-09-27T00:37:10.093Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469423921-60pq",
+      "timestamp": "21:37:03",
+      "isoTime": "2026-09-27T00:37:03.921Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469423323-rhz2",
+      "timestamp": "21:37:03",
+      "isoTime": "2026-09-27T00:37:03.323Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469421304-3wto",
+      "timestamp": "21:37:01",
+      "isoTime": "2026-09-27T00:37:01.304Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469416259-exdg",
+      "timestamp": "21:36:56",
+      "isoTime": "2026-09-27T00:36:56.259Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469415682-1wfk",
+      "timestamp": "21:36:55",
+      "isoTime": "2026-09-27T00:36:55.682Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469413664-3ble",
+      "timestamp": "21:36:53",
+      "isoTime": "2026-09-27T00:36:53.664Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469406684-2q09",
+      "timestamp": "21:36:46",
+      "isoTime": "2026-09-27T00:36:46.684Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469406106-30gg",
+      "timestamp": "21:36:46",
+      "isoTime": "2026-09-27T00:36:46.106Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469404097-lt4z",
+      "timestamp": "21:36:44",
+      "isoTime": "2026-09-27T00:36:44.097Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469400068-mc5b",
+      "timestamp": "21:36:40",
+      "isoTime": "2026-09-27T00:36:40.068Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469399500-gsg9",
+      "timestamp": "21:36:39",
+      "isoTime": "2026-09-27T00:36:39.500Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469397484-2ymo",
+      "timestamp": "21:36:37",
+      "isoTime": "2026-09-27T00:36:37.484Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469390185-j9cx",
+      "timestamp": "21:36:30",
+      "isoTime": "2026-09-27T00:36:30.185Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469389606-9r8l",
+      "timestamp": "21:36:29",
+      "isoTime": "2026-09-27T00:36:29.606Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469387596-gx2g",
+      "timestamp": "21:36:27",
+      "isoTime": "2026-09-27T00:36:27.596Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469381426-m2j8",
+      "timestamp": "21:36:21",
+      "isoTime": "2026-09-27T00:36:21.426Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469380847-x9oh",
+      "timestamp": "21:36:20",
+      "isoTime": "2026-09-27T00:36:20.847Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469378837-nb8q",
+      "timestamp": "21:36:18",
+      "isoTime": "2026-09-27T00:36:18.837Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469374294-qoys",
+      "timestamp": "21:36:14",
+      "isoTime": "2026-09-27T00:36:14.294Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469373715-9e9s",
+      "timestamp": "21:36:13",
+      "isoTime": "2026-09-27T00:36:13.715Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469371705-ctla",
+      "timestamp": "21:36:11",
+      "isoTime": "2026-09-27T00:36:11.705Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469365469-q4nd",
+      "timestamp": "21:36:05",
+      "isoTime": "2026-09-27T00:36:05.469Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469364905-3b3t",
+      "timestamp": "21:36:04",
+      "isoTime": "2026-09-27T00:36:04.905Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469362888-ecks",
+      "timestamp": "21:36:02",
+      "isoTime": "2026-09-27T00:36:02.888Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469357829-u7g1",
+      "timestamp": "21:35:57",
+      "isoTime": "2026-09-27T00:35:57.829Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469357248-32xs",
+      "timestamp": "21:35:57",
+      "isoTime": "2026-09-27T00:35:57.248Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469355240-d4q4",
+      "timestamp": "21:35:55",
+      "isoTime": "2026-09-27T00:35:55.240Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469350163-qr37",
+      "timestamp": "21:35:50",
+      "isoTime": "2026-09-27T00:35:50.163Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469349558-xy0y",
+      "timestamp": "21:35:49",
+      "isoTime": "2026-09-27T00:35:49.558Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469347539-xg1p",
+      "timestamp": "21:35:47",
+      "isoTime": "2026-09-27T00:35:47.539Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469341733-dxjb",
+      "timestamp": "21:35:41",
+      "isoTime": "2026-09-27T00:35:41.733Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469341132-anst",
+      "timestamp": "21:35:41",
+      "isoTime": "2026-09-27T00:35:41.132Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469339115-tyew",
+      "timestamp": "21:35:39",
+      "isoTime": "2026-09-27T00:35:39.115Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469331476-eb61",
+      "timestamp": "21:35:31",
+      "isoTime": "2026-09-27T00:35:31.476Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469330905-023k",
+      "timestamp": "21:35:30",
+      "isoTime": "2026-09-27T00:35:30.905Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469328891-j3dl",
+      "timestamp": "21:35:28",
+      "isoTime": "2026-09-27T00:35:28.891Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469323024-qnjf",
+      "timestamp": "21:35:23",
+      "isoTime": "2026-09-27T00:35:23.024Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469322463-pb46",
+      "timestamp": "21:35:22",
+      "isoTime": "2026-09-27T00:35:22.463Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469320456-0nu5",
+      "timestamp": "21:35:20",
+      "isoTime": "2026-09-27T00:35:20.456Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469312793-af8j",
+      "timestamp": "21:35:12",
+      "isoTime": "2026-09-27T00:35:12.793Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469312236-1sxy",
+      "timestamp": "21:35:12",
+      "isoTime": "2026-09-27T00:35:12.236Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469310219-2pqs",
+      "timestamp": "21:35:10",
+      "isoTime": "2026-09-27T00:35:10.219Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469304330-j5gt",
+      "timestamp": "21:35:04",
+      "isoTime": "2026-09-27T00:35:04.330Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469303761-av1c",
+      "timestamp": "21:35:03",
+      "isoTime": "2026-09-27T00:35:03.761Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469301750-axs1",
+      "timestamp": "21:35:01",
+      "isoTime": "2026-09-27T00:35:01.750Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469296040-6k5o",
+      "timestamp": "21:34:56",
+      "isoTime": "2026-09-27T00:34:56.040Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469295470-nl05",
+      "timestamp": "21:34:55",
+      "isoTime": "2026-09-27T00:34:55.471Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469293462-a05c",
+      "timestamp": "21:34:53",
+      "isoTime": "2026-09-27T00:34:53.462Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469287772-p6t1",
+      "timestamp": "21:34:47",
+      "isoTime": "2026-09-27T00:34:47.772Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469287194-xoqq",
+      "timestamp": "21:34:47",
+      "isoTime": "2026-09-27T00:34:47.194Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469285182-dlxa",
+      "timestamp": "21:34:45",
+      "isoTime": "2026-09-27T00:34:45.182Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469277847-q8no",
+      "timestamp": "21:34:37",
+      "isoTime": "2026-09-27T00:34:37.847Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469277252-0737",
+      "timestamp": "21:34:37",
+      "isoTime": "2026-09-27T00:34:37.252Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469275249-5ia0",
+      "timestamp": "21:34:35",
+      "isoTime": "2026-09-27T00:34:35.249Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469269049-n24s",
+      "timestamp": "21:34:29",
+      "isoTime": "2026-09-27T00:34:29.049Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469268479-qxkc",
+      "timestamp": "21:34:28",
+      "isoTime": "2026-09-27T00:34:28.480Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469266478-mpyt",
+      "timestamp": "21:34:26",
+      "isoTime": "2026-09-27T00:34:26.478Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469259151-uzr5",
+      "timestamp": "21:34:19",
+      "isoTime": "2026-09-27T00:34:19.151Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469258582-6zub",
+      "timestamp": "21:34:18",
+      "isoTime": "2026-09-27T00:34:18.582Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469256578-rzg8",
+      "timestamp": "21:34:16",
+      "isoTime": "2026-09-27T00:34:16.578Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469250264-gwpv",
+      "timestamp": "21:34:10",
+      "isoTime": "2026-09-27T00:34:10.264Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469249673-4y35",
+      "timestamp": "21:34:09",
+      "isoTime": "2026-09-27T00:34:09.673Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469247667-3pau",
+      "timestamp": "21:34:07",
+      "isoTime": "2026-09-27T00:34:07.667Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469240414-zm5g",
+      "timestamp": "21:34:00",
+      "isoTime": "2026-09-27T00:34:00.414Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469239814-edoo",
+      "timestamp": "21:33:59",
+      "isoTime": "2026-09-27T00:33:59.814Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469237802-r8c9",
+      "timestamp": "21:33:57",
+      "isoTime": "2026-09-27T00:33:57.802Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469231482-jkap",
+      "timestamp": "21:33:51",
+      "isoTime": "2026-09-27T00:33:51.482Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469230887-c4ks",
+      "timestamp": "21:33:50",
+      "isoTime": "2026-09-27T00:33:50.887Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469228870-4rae",
+      "timestamp": "21:33:48",
+      "isoTime": "2026-09-27T00:33:48.870Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469221732-dbgc",
+      "timestamp": "21:33:41",
+      "isoTime": "2026-09-27T00:33:41.732Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469221161-g0j5",
+      "timestamp": "21:33:41",
+      "isoTime": "2026-09-27T00:33:41.161Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469219144-wc2e",
+      "timestamp": "21:33:39",
+      "isoTime": "2026-09-27T00:33:39.144Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469214564-myv3",
+      "timestamp": "21:33:34",
+      "isoTime": "2026-09-27T00:33:34.564Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469213978-8i93",
+      "timestamp": "21:33:33",
+      "isoTime": "2026-09-27T00:33:33.978Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469211976-v6ss",
+      "timestamp": "21:33:31",
+      "isoTime": "2026-09-27T00:33:31.976Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469205718-zk7q",
+      "timestamp": "21:33:25",
+      "isoTime": "2026-09-27T00:33:25.718Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469205128-p7a7",
+      "timestamp": "21:33:25",
+      "isoTime": "2026-09-27T00:33:25.128Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469203118-2rz9",
+      "timestamp": "21:33:23",
+      "isoTime": "2026-09-27T00:33:23.118Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469195653-rliu",
+      "timestamp": "21:33:15",
+      "isoTime": "2026-09-27T00:33:15.653Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469195085-41ga",
+      "timestamp": "21:33:15",
+      "isoTime": "2026-09-27T00:33:15.085Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469193075-dkva",
+      "timestamp": "21:33:13",
+      "isoTime": "2026-09-27T00:33:13.075Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469186991-zkpz",
+      "timestamp": "21:33:06",
+      "isoTime": "2026-09-27T00:33:06.991Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469186428-ds2y",
+      "timestamp": "21:33:06",
+      "isoTime": "2026-09-27T00:33:06.428Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469184409-ekru",
+      "timestamp": "21:33:04",
+      "isoTime": "2026-09-27T00:33:04.409Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469176748-rzrb",
+      "timestamp": "21:32:56",
+      "isoTime": "2026-09-27T00:32:56.749Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469176149-8ny6",
+      "timestamp": "21:32:56",
+      "isoTime": "2026-09-27T00:32:56.149Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469174139-6imd",
+      "timestamp": "21:32:54",
+      "isoTime": "2026-09-27T00:32:54.139Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469168222-fgpt",
+      "timestamp": "21:32:48",
+      "isoTime": "2026-09-27T00:32:48.222Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469167640-r79g",
+      "timestamp": "21:32:47",
+      "isoTime": "2026-09-27T00:32:47.640Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469165623-dp3n",
+      "timestamp": "21:32:45",
+      "isoTime": "2026-09-27T00:32:45.623Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469157792-k6wy",
+      "timestamp": "21:32:37",
+      "isoTime": "2026-09-27T00:32:37.792Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469157197-ofwi",
+      "timestamp": "21:32:37",
+      "isoTime": "2026-09-27T00:32:37.197Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469155182-vcg3",
+      "timestamp": "21:32:35",
+      "isoTime": "2026-09-27T00:32:35.182Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469147310-kccj",
+      "timestamp": "21:32:27",
+      "isoTime": "2026-09-27T00:32:27.310Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469146708-4162",
+      "timestamp": "21:32:26",
+      "isoTime": "2026-09-27T00:32:26.708Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469144705-gi39",
+      "timestamp": "21:32:24",
+      "isoTime": "2026-09-27T00:32:24.705Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469139015-ty9i",
+      "timestamp": "21:32:19",
+      "isoTime": "2026-09-27T00:32:19.015Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469138443-wonb",
+      "timestamp": "21:32:18",
+      "isoTime": "2026-09-27T00:32:18.445Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469136438-1j9i",
+      "timestamp": "21:32:16",
+      "isoTime": "2026-09-27T00:32:16.438Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469130765-a0v3",
+      "timestamp": "21:32:10",
+      "isoTime": "2026-09-27T00:32:10.765Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469130203-xm4k",
+      "timestamp": "21:32:10",
+      "isoTime": "2026-09-27T00:32:10.203Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469128197-76ot",
+      "timestamp": "21:32:08",
+      "isoTime": "2026-09-27T00:32:08.197Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469120261-xa85",
+      "timestamp": "21:32:00",
+      "isoTime": "2026-09-27T00:32:00.261Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469119677-3yu5",
+      "timestamp": "21:31:59",
+      "isoTime": "2026-09-27T00:31:59.678Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469117668-warv",
+      "timestamp": "21:31:57",
+      "isoTime": "2026-09-27T00:31:57.668Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469112003-b9um",
+      "timestamp": "21:31:52",
+      "isoTime": "2026-09-27T00:31:52.003Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469111437-55br",
+      "timestamp": "21:31:51",
+      "isoTime": "2026-09-27T00:31:51.437Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469109436-2bwd",
+      "timestamp": "21:31:49",
+      "isoTime": "2026-09-27T00:31:49.436Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469101648-u6tb",
+      "timestamp": "21:31:41",
+      "isoTime": "2026-09-27T00:31:41.648Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469100975-ii2n",
+      "timestamp": "21:31:40",
+      "isoTime": "2026-09-27T00:31:40.976Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469098964-od6u",
+      "timestamp": "21:31:38",
+      "isoTime": "2026-09-27T00:31:38.964Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469093286-lsi9",
+      "timestamp": "21:31:33",
+      "isoTime": "2026-09-27T00:31:33.286Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469092717-pzdt",
+      "timestamp": "21:31:32",
+      "isoTime": "2026-09-27T00:31:32.717Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469090706-9mmf",
+      "timestamp": "21:31:30",
+      "isoTime": "2026-09-27T00:31:30.706Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469083453-71zi",
+      "timestamp": "21:31:23",
+      "isoTime": "2026-09-27T00:31:23.453Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469082890-hcbg",
+      "timestamp": "21:31:22",
+      "isoTime": "2026-09-27T00:31:22.890Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469080873-l7fe",
+      "timestamp": "21:31:20",
+      "isoTime": "2026-09-27T00:31:20.874Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469075489-081b",
+      "timestamp": "21:31:15",
+      "isoTime": "2026-09-27T00:31:15.489Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469074916-me6u",
+      "timestamp": "21:31:14",
+      "isoTime": "2026-09-27T00:31:14.916Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469072904-bo1o",
+      "timestamp": "21:31:12",
+      "isoTime": "2026-09-27T00:31:12.905Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469069614-b7ws",
+      "timestamp": "21:31:09",
+      "isoTime": "2026-09-27T00:31:09.614Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469069009-eeu0",
+      "timestamp": "21:31:09",
+      "isoTime": "2026-09-27T00:31:09.009Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469066982-pzc5",
+      "timestamp": "21:31:06",
+      "isoTime": "2026-09-27T00:31:06.982Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469061579-6g03",
+      "timestamp": "21:31:01",
+      "isoTime": "2026-09-27T00:31:01.580Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469061005-6teh",
+      "timestamp": "21:31:01",
+      "isoTime": "2026-09-27T00:31:01.005Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469058988-mkpm",
+      "timestamp": "21:30:58",
+      "isoTime": "2026-09-27T00:30:58.988Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469053748-gkat",
+      "timestamp": "21:30:53",
+      "isoTime": "2026-09-27T00:30:53.748Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469053180-e9bp",
+      "timestamp": "21:30:53",
+      "isoTime": "2026-09-27T00:30:53.180Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469051174-gftc",
+      "timestamp": "21:30:51",
+      "isoTime": "2026-09-27T00:30:51.174Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469047612-487z",
+      "timestamp": "21:30:47",
+      "isoTime": "2026-09-27T00:30:47.612Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469047040-mofv",
+      "timestamp": "21:30:47",
+      "isoTime": "2026-09-27T00:30:47.040Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469045035-18ef",
+      "timestamp": "21:30:45",
+      "isoTime": "2026-09-27T00:30:45.035Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469039976-m1l2",
+      "timestamp": "21:30:39",
+      "isoTime": "2026-09-27T00:30:39.976Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469039402-hm6e",
+      "timestamp": "21:30:39",
+      "isoTime": "2026-09-27T00:30:39.402Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469037383-1cuj",
+      "timestamp": "21:30:37",
+      "isoTime": "2026-09-27T00:30:37.383Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469032937-5yhl",
+      "timestamp": "21:30:32",
+      "isoTime": "2026-09-27T00:30:32.937Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469032360-yr4r",
+      "timestamp": "21:30:32",
+      "isoTime": "2026-09-27T00:30:32.360Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469030345-w69i",
+      "timestamp": "21:30:30",
+      "isoTime": "2026-09-27T00:30:30.345Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469026195-kuje",
+      "timestamp": "21:30:26",
+      "isoTime": "2026-09-27T00:30:26.195Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469025619-hl91",
+      "timestamp": "21:30:25",
+      "isoTime": "2026-09-27T00:30:25.619Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469023601-7vuo",
+      "timestamp": "21:30:23",
+      "isoTime": "2026-09-27T00:30:23.601Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469018435-gi49",
+      "timestamp": "21:30:18",
+      "isoTime": "2026-09-27T00:30:18.435Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469017853-9h3t",
+      "timestamp": "21:30:17",
+      "isoTime": "2026-09-27T00:30:17.853Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469015848-4c82",
+      "timestamp": "21:30:15",
+      "isoTime": "2026-09-27T00:30:15.848Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469010270-pldl",
+      "timestamp": "21:30:10",
+      "isoTime": "2026-09-27T00:30:10.270Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469009686-8cvw",
+      "timestamp": "21:30:09",
+      "isoTime": "2026-09-27T00:30:09.687Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469007682-ef3r",
+      "timestamp": "21:30:07",
+      "isoTime": "2026-09-27T00:30:07.682Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469003877-bi6l",
+      "timestamp": "21:30:03",
+      "isoTime": "2026-09-27T00:30:03.877Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790469003291-yww6",
+      "timestamp": "21:30:03",
+      "isoTime": "2026-09-27T00:30:03.291Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790469001281-740q",
+      "timestamp": "21:30:01",
+      "isoTime": "2026-09-27T00:30:01.281Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468996491-rq3w",
+      "timestamp": "21:29:56",
+      "isoTime": "2026-09-27T00:29:56.491Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468995916-tpp4",
+      "timestamp": "21:29:55",
+      "isoTime": "2026-09-27T00:29:55.916Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468993910-8ijk",
+      "timestamp": "21:29:53",
+      "isoTime": "2026-09-27T00:29:53.910Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468988850-q8b4",
+      "timestamp": "21:29:48",
+      "isoTime": "2026-09-27T00:29:48.850Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468988276-862s",
+      "timestamp": "21:29:48",
+      "isoTime": "2026-09-27T00:29:48.276Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468986256-ucds",
+      "timestamp": "21:29:46",
+      "isoTime": "2026-09-27T00:29:46.256Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468983064-ofip",
+      "timestamp": "21:29:43",
+      "isoTime": "2026-09-27T00:29:43.064Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468982488-1z2v",
+      "timestamp": "21:29:42",
+      "isoTime": "2026-09-27T00:29:42.488Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468980480-lne2",
+      "timestamp": "21:29:40",
+      "isoTime": "2026-09-27T00:29:40.480Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468975444-ggv7",
+      "timestamp": "21:29:35",
+      "isoTime": "2026-09-27T00:29:35.445Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468974846-w51h",
+      "timestamp": "21:29:34",
+      "isoTime": "2026-09-27T00:29:34.846Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468972831-v6w3",
+      "timestamp": "21:29:32",
+      "isoTime": "2026-09-27T00:29:32.832Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468969278-7yp4",
+      "timestamp": "21:29:29",
+      "isoTime": "2026-09-27T00:29:29.278Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468968690-i54r",
+      "timestamp": "21:29:28",
+      "isoTime": "2026-09-27T00:29:28.690Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468966676-k2f9",
+      "timestamp": "21:29:26",
+      "isoTime": "2026-09-27T00:29:26.676Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468961579-bvbl",
+      "timestamp": "21:29:21",
+      "isoTime": "2026-09-27T00:29:21.579Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468960951-us5c",
+      "timestamp": "21:29:20",
+      "isoTime": "2026-09-27T00:29:20.951Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468958947-y4zb",
+      "timestamp": "21:29:18",
+      "isoTime": "2026-09-27T00:29:18.947Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468955725-lgor",
+      "timestamp": "21:29:15",
+      "isoTime": "2026-09-27T00:29:15.725Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468955160-rqve",
+      "timestamp": "21:29:15",
+      "isoTime": "2026-09-27T00:29:15.160Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468953149-60o6",
+      "timestamp": "21:29:13",
+      "isoTime": "2026-09-27T00:29:13.149Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468948079-jbix",
+      "timestamp": "21:29:08",
+      "isoTime": "2026-09-27T00:29:08.079Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468947486-6cz8",
+      "timestamp": "21:29:07",
+      "isoTime": "2026-09-27T00:29:07.486Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468945477-uc3b",
+      "timestamp": "21:29:05",
+      "isoTime": "2026-09-27T00:29:05.477Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468940662-aftw",
+      "timestamp": "21:29:00",
+      "isoTime": "2026-09-27T00:29:00.662Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468940080-e8em",
+      "timestamp": "21:29:00",
+      "isoTime": "2026-09-27T00:29:00.080Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468938075-9lyc",
+      "timestamp": "21:28:58",
+      "isoTime": "2026-09-27T00:28:58.075Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468934278-5hk7",
+      "timestamp": "21:28:54",
+      "isoTime": "2026-09-27T00:28:54.278Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468933707-mtxp",
+      "timestamp": "21:28:53",
+      "isoTime": "2026-09-27T00:28:53.707Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468931688-ou5a",
+      "timestamp": "21:28:51",
+      "isoTime": "2026-09-27T00:28:51.689Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468924767-5dm3",
+      "timestamp": "21:28:44",
+      "isoTime": "2026-09-27T00:28:44.767Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468924214-5cat",
+      "timestamp": "21:28:44",
+      "isoTime": "2026-09-27T00:28:44.214Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468922196-xtdl",
+      "timestamp": "21:28:42",
+      "isoTime": "2026-09-27T00:28:42.196Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468915590-nrln",
+      "timestamp": "21:28:35",
+      "isoTime": "2026-09-27T00:28:35.590Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468915020-weiz",
+      "timestamp": "21:28:35",
+      "isoTime": "2026-09-27T00:28:35.020Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468913008-hj7g",
+      "timestamp": "21:28:33",
+      "isoTime": "2026-09-27T00:28:33.008Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468906097-pyp5",
+      "timestamp": "21:28:26",
+      "isoTime": "2026-09-27T00:28:26.097Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468905529-3727",
+      "timestamp": "21:28:25",
+      "isoTime": "2026-09-27T00:28:25.529Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468903521-sn6q",
+      "timestamp": "21:28:23",
+      "isoTime": "2026-09-27T00:28:23.521Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468896915-x1qd",
+      "timestamp": "21:28:16",
+      "isoTime": "2026-09-27T00:28:16.915Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468896336-g5m8",
+      "timestamp": "21:28:16",
+      "isoTime": "2026-09-27T00:28:16.336Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468894321-r1u5",
+      "timestamp": "21:28:14",
+      "isoTime": "2026-09-27T00:28:14.321Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468887412-8v4g",
+      "timestamp": "21:28:07",
+      "isoTime": "2026-09-27T00:28:07.412Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468886827-5lyh",
+      "timestamp": "21:28:06",
+      "isoTime": "2026-09-27T00:28:06.827Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468884815-svnz",
+      "timestamp": "21:28:04",
+      "isoTime": "2026-09-27T00:28:04.815Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468878177-rqnu",
+      "timestamp": "21:27:58",
+      "isoTime": "2026-09-27T00:27:58.177Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468877599-ocfq",
+      "timestamp": "21:27:57",
+      "isoTime": "2026-09-27T00:27:57.599Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468875594-3g6d",
+      "timestamp": "21:27:55",
+      "isoTime": "2026-09-27T00:27:55.594Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468868646-t4yb",
+      "timestamp": "21:27:48",
+      "isoTime": "2026-09-27T00:27:48.646Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468868061-qom1",
+      "timestamp": "21:27:48",
+      "isoTime": "2026-09-27T00:27:48.061Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468866059-3iwg",
+      "timestamp": "21:27:46",
+      "isoTime": "2026-09-27T00:27:46.059Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468859445-cz0d",
+      "timestamp": "21:27:39",
+      "isoTime": "2026-09-27T00:27:39.445Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468858868-u7ph",
+      "timestamp": "21:27:38",
+      "isoTime": "2026-09-27T00:27:38.868Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468856847-gpg2",
+      "timestamp": "21:27:36",
+      "isoTime": "2026-09-27T00:27:36.847Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468849886-4yes",
+      "timestamp": "21:27:29",
+      "isoTime": "2026-09-27T00:27:29.886Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468849305-y3e7",
+      "timestamp": "21:27:29",
+      "isoTime": "2026-09-27T00:27:29.305Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468847297-224s",
+      "timestamp": "21:27:27",
+      "isoTime": "2026-09-27T00:27:27.297Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468840570-lh3s",
+      "timestamp": "21:27:20",
+      "isoTime": "2026-09-27T00:27:20.570Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468840003-ma89",
+      "timestamp": "21:27:20",
+      "isoTime": "2026-09-27T00:27:20.003Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468837998-o4fe",
+      "timestamp": "21:27:17",
+      "isoTime": "2026-09-27T00:27:17.998Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468831188-c3qp",
+      "timestamp": "21:27:11",
+      "isoTime": "2026-09-27T00:27:11.188Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468830602-6fo3",
+      "timestamp": "21:27:10",
+      "isoTime": "2026-09-27T00:27:10.602Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468828587-djzi",
+      "timestamp": "21:27:08",
+      "isoTime": "2026-09-27T00:27:08.587Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468821833-3sf3",
+      "timestamp": "21:27:01",
+      "isoTime": "2026-09-27T00:27:01.833Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468821790-li9i",
+      "timestamp": "21:27:01",
+      "isoTime": "2026-09-27T00:27:01.790Z",
+      "category": "SYSTEM",
+      "level": "SUCCESS",
+      "message": "Perfil localizado: \"🔥🕹️Raquel🔥⚜️\" (ID: 11636523, Shared: 91513136). Ao vivo: NÃO (Vigilante)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468821193-fhjf",
+      "timestamp": "21:27:01",
+      "isoTime": "2026-09-27T00:27:01.193Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468820349-pel0",
+      "timestamp": "21:27:00",
+      "isoTime": "2026-09-27T00:27:00.383Z",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "Engine Super Client iniciada com sucesso. Servidor operacional.",
+      "details": null
+    },
+    {
+      "id": "sys-1790468820290-oxdj",
+      "timestamp": "21:27:00",
+      "isoTime": "2026-09-27T00:27:00.290Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468806972-nmte",
+      "timestamp": "21:26:46",
+      "isoTime": "2026-09-27T00:26:46.972Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468806380-avqr",
+      "timestamp": "21:26:46",
+      "isoTime": "2026-09-27T00:26:46.380Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468804363-06ht",
+      "timestamp": "21:26:44",
+      "isoTime": "2026-09-27T00:26:44.363Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1000, motivo: duplicate_connection). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468758995-uni0",
+      "timestamp": "21:25:58",
+      "isoTime": "2026-09-27T00:25:58.995Z",
+      "category": "WS",
+      "level": "SUCCESS",
+      "message": "Conexão WebSocket estabelecida com sucesso! (Device-ID)",
+      "details": null
+    },
+    {
+      "id": "sys-1790468758212-8bu1",
+      "timestamp": "21:25:58",
+      "isoTime": "2026-09-27T00:25:58.213Z",
+      "category": "WS",
+      "level": "INFO",
+      "message": "Iniciando conexão WebSocket oficial (Device-ID)...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468756206-4bl1",
+      "timestamp": "21:25:56",
+      "isoTime": "2026-09-27T00:25:56.206Z",
+      "category": "WS",
+      "level": "WARN",
+      "message": "Conexão WebSocket finalizada (código: 1006, motivo: N/A). Reconectando em 2s...",
+      "details": null
+    },
+    {
+      "id": "sys-1790468756192-l3vp",
+      "timestamp": "21:25:56",
+      "isoTime": "2026-09-27T00:25:56.200Z",
+      "category": "WS",
+      "level": "ERROR",
+      "message": "Erro de conexão WebSocket: [object ErrorEvent]",
+      "details": null
+    },
+    {
+      "id": "sys-1790468451499-xsod",
+      "timestamp": "21:20:51",
+      "isoTime": "2026-09-27T00:20:51.499Z",
+      "category": "SYSTEM",
+      "level": "SUCCESS",
+      "message": "Perfil localizado: \"♡🌜LUA🌛♡\" (ID: 26850812, Shared: 35729338). Ao vivo: NÃO (Vigilante)",
+      "details": null
+    },
     {
       "id": "sys-1790468395717-0mj7",
       "timestamp": "21:19:55",

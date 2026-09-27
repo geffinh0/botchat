@@ -138,6 +138,7 @@ class BotEngine {
   apiRequest(apiPath, body = {}, forceNoToken = false) {
     return new Promise((resolve, reject) => {
       const payload = JSON.stringify(body);
+      const isPublicPath = ['users/search', 'users/profile', 'livestream/retrieve'].includes(apiPath);
       const headers = {
         'Content-Type': 'application/json; charset=UTF-8',
         'Accept': 'application/json',
@@ -146,7 +147,7 @@ class BotEngine {
         'Content-Length': Buffer.byteLength(payload)
       };
 
-      if (this.config.botToken && !this.authFailed && !forceNoToken) {
+      if (this.config.botToken && !this.authFailed && !forceNoToken && !isPublicPath) {
         headers['Authorization'] = `Token ${this.config.botToken}`;
       }
 
@@ -186,6 +187,11 @@ class BotEngine {
 
   // --- WebSocket Manager ---
   connectWebSocket() {
+    // Conecta somente se estiver ativamente monitorando ou conectado a uma live
+    if (!this.isMonitoring && !this.activeLive) {
+      return;
+    }
+
     if (this.ws && (this.ws.readyState === 0 || this.ws.readyState === 1)) {
       return;
     }
@@ -210,8 +216,8 @@ class BotEngine {
         this.logSystem('WS', 'SUCCESS', `Conexão WebSocket estabelecida com sucesso! (${hasValidToken ? 'Autenticado' : 'Device-ID'})`);
         this.startHeartbeat();
 
-        // Se estiver monitorando live ativa, reconecta à sala da live
-        if (this.isMonitoring && this.activeLive && this.activeLive.livestream_id) {
+        // Se estiver monitorando live ativa, entra na sala da transmissão
+        if (this.activeLive && this.activeLive.livestream_id) {
           this.sendWsEnterLive(this.activeLive.livestream_id);
         }
       };
@@ -226,12 +232,28 @@ class BotEngine {
 
       this.ws.onclose = (evt) => {
         this.wsConnected = false;
-        this.logSystem('WS', 'WARN', `Conexão WebSocket finalizada (código: ${evt.code}, motivo: ${evt.reason || 'N/A'}). Reconectando em 2s...`);
         this.stopHeartbeat();
+
+        if (evt.reason === 'duplicate_connection') {
+          this.config.deviceId = crypto.randomBytes(16).toString('hex');
+          db.saveConfig({ deviceId: this.config.deviceId });
+          this.logSystem('WS', 'INFO', `Conexão simultânea evitada. Novo Device-ID único gerado: ${this.config.deviceId}`);
+        }
+
+        // Não reconecta se a moderação estiver parada
+        if (!this.isMonitoring && !this.activeLive) {
+          return;
+        }
+
+        const waitTime = evt.reason === 'duplicate_connection' ? 5000 : 3000;
+        this.logSystem('WS', 'WARN', `Conexão WebSocket finalizada (código: ${evt.code}, motivo: ${evt.reason || 'N/A'}). Reconectando em ${waitTime / 1000}s...`);
+
         if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
         this.reconnectTimer = setTimeout(() => {
-          this.connectWebSocket();
-        }, 2000);
+          if (this.isMonitoring || this.activeLive) {
+            this.connectWebSocket();
+          }
+        }, waitTime);
       };
     } catch (e) {
       this.logSystem('WS', 'ERROR', `Falha ao instanciar WebSocket: ${e.message}`);
@@ -242,10 +264,13 @@ class BotEngine {
     this.stopHeartbeat();
     this.heartbeatTimer = setInterval(() => {
       if (this.ws && this.ws.readyState === 1) {
+        const liveId = this.activeLive ? this.activeLive.livestream_id : null;
         this.ws.send(JSON.stringify({
           id: `hb-${Date.now()}`,
           action: 'heartbeat',
-          data: { state: '' }
+          data: {
+            state: liveId ? `livestream:${liveId}` : 'general'
+          }
         }));
       }
     }, 5000);
@@ -285,10 +310,9 @@ class BotEngine {
       if (!msg || !msg.type) return;
 
       if (msg.type === 'invalid_auth') {
-        this.logSystem('WS', 'WARN', 'Token de autenticação inválido ou desconectado pelo SuperLive (invalid_auth). Alternando para conexão direta contínua via Device-ID...');
-        this.authFailed = true;
-        if (this.ws) {
-          try { this.ws.close(); } catch (e) {}
+        if (!this.authFailed) {
+          this.logSystem('WS', 'INFO', 'WebSocket operando em Modo Device-ID (escuta em tempo real do chat e eventos da live).');
+          this.authFailed = true;
         }
         return;
       }
@@ -676,62 +700,62 @@ class BotEngine {
     let targetLiveId = null;
     let streamDetails = null;
 
-    // 1. Tenta verificar diretamente como Livestream ID
+    // 1. Busca por users/search (busca exata por shared_id, user_id, username ou nome)
     try {
-      const liveRes = await this.apiRequest('livestream/retrieve', { livestream_id: raw });
-      if (liveRes && !liveRes.error && liveRes.stream_details) {
-        const sd = liveRes.stream_details;
-        const u = liveRes.user || {};
-        if (!sd.finished_at) {
-          targetLiveId = String(raw);
-          streamDetails = sd;
-          targetUser = u;
+      const searchRes = await this.apiRequest('users/search', { search_query: raw });
+      if (searchRes && searchRes.items && searchRes.items.length > 0) {
+        // Correspondência exata prioritária por shared_id, user_id ou username
+        let match = searchRes.items.find(it => 
+          String(it.shared_id) === raw || 
+          String(it.user_id) === raw || 
+          (it.username && String(it.username).toLowerCase() === raw.toLowerCase())
+        );
+
+        // Se a busca não for puramente numérica, tenta correspondência por nome
+        if (!match && isNaN(Number(raw))) {
+          match = searchRes.items.find(it => 
+            it.name && it.name.toLowerCase().includes(raw.toLowerCase())
+          ) || searchRes.items[0];
         }
-      }
-    } catch (e) {}
 
-    // 2. Busca por users/search (busca exata por shared_id, username ou nome)
-    if (!targetUser) {
-      try {
-        const searchRes = await this.apiRequest('users/search', { search_query: raw });
-        if (searchRes && searchRes.items && searchRes.items.length > 0) {
-          // Busca prioritária por correspondência EXATA de shared_id, user_id ou username
-          let match = searchRes.items.find(it => 
-            String(it.shared_id) === raw || 
-            String(it.user_id) === raw || 
-            (it.username && String(it.username).toLowerCase() === raw.toLowerCase())
-          );
-
-          // Se a busca não for puramente numérica (ex: nome de usuário textual)
-          if (!match && isNaN(Number(raw))) {
-            match = searchRes.items.find(it => 
-              it.name && it.name.toLowerCase().includes(raw.toLowerCase())
-            ) || searchRes.items[0];
-          }
-
-          if (match) {
-            targetUser = match;
-            if (match.livestream_id) {
-              targetLiveId = String(match.livestream_id);
-            }
+        if (match) {
+          targetUser = match;
+          if (match.livestream_id) {
+            targetLiveId = String(match.livestream_id);
           }
         }
-      } catch (e) {
-        console.error('[BOT DETECT] Erro em users/search:', e.message);
       }
+    } catch (e) {
+      console.error('[BOT DETECT] Erro em users/search:', e.message);
     }
 
-    // 3. Tenta users/profile diretamente caso seja um ID numérico interno
+    // 2. Se não encontrou, tenta users/profile diretamente caso seja ID de usuário
     if (!targetUser) {
       try {
         const profRes = await this.apiRequest('users/profile', { user_id: raw });
         if (profRes && profRes.user && !profRes.error) {
-          // Validação rigorosa: só aceita se o perfil retornado realmente bater com o ID buscado
           if (String(profRes.user.user_id) === raw || String(profRes.user.shared_id) === raw) {
             targetUser = profRes.user;
             if (profRes.user.livestream_id) {
               targetLiveId = String(profRes.user.livestream_id);
             }
+          }
+        }
+      } catch (e) {}
+    }
+
+    // 3. Se ainda não encontrou como usuário, verifica se é o ID de uma live ativa em andamento
+    if (!targetUser) {
+      try {
+        const liveRes = await this.apiRequest('livestream/retrieve', { livestream_id: raw });
+        if (liveRes && !liveRes.error && liveRes.stream_details) {
+          const sd = liveRes.stream_details;
+          const u = liveRes.user || {};
+          // Só aceita como live ativa se ela NÃO estiver finalizada
+          if (!sd.finished_at) {
+            targetLiveId = String(raw);
+            streamDetails = sd;
+            targetUser = u;
           }
         }
       } catch (e) {}
@@ -754,8 +778,10 @@ class BotEngine {
       if (targetLiveId && !streamDetails) {
         try {
           const liveRes = await this.apiRequest('livestream/retrieve', { livestream_id: targetLiveId });
-          if (liveRes && liveRes.stream_details) {
+          if (liveRes && liveRes.stream_details && !liveRes.stream_details.finished_at) {
             streamDetails = liveRes.stream_details;
+          } else if (liveRes && liveRes.stream_details && liveRes.stream_details.finished_at) {
+            targetLiveId = null;
           }
         } catch (e) {}
       }

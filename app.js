@@ -1834,11 +1834,13 @@ function initBotModeratorModule() {
             Mod: <strong>${data.activeLive.is_modded ? 'AUTORIZADO' : 'AGUARDANDO MOD'}</strong>
           `;
         } else if (currentCreator) {
-          liveBadgePill.className = 'live-pill offline';
-          liveBadgeText.textContent = 'OFFLINE (VIGILANTE)';
+          liveBadgePill.className = data.isMonitoring ? 'live-pill active' : 'live-pill offline';
+          liveBadgeText.textContent = data.isMonitoring ? 'MODO VIGILANTE ATIVO' : 'OFFLINE (VIGILANTE)';
           liveInfoPreview.innerHTML = `
-            Criadora <strong>${escapeHtml(currentCreator.name || 'Criadora')}</strong> identificada. 💎 ${(currentCreator.diamonds || 0).toLocaleString()} diamantes na conta.
-            <span style="color:var(--accent);">Robô ativo em Modo Vigilante.</span>
+            Criadora <strong>${escapeHtml(currentCreator.name || 'Criadora')}</strong> identificada. 
+            <span style="color:${data.isMonitoring ? 'var(--success)' : 'var(--accent)'}; font-weight:700;">
+              ${data.isMonitoring ? '● Robô ativo em Modo Vigilante — monitorando e pronto para entrar na live automaticamente!' : 'Robô pronto.'}
+            </span>
           `;
         } else {
           liveBadgePill.className = 'live-pill offline';
@@ -2031,16 +2033,20 @@ function initBotModeratorModule() {
           }
           saveBotConfig(false);
 
+          // Inicia automaticamente o monitoramento da live ou Modo Vigilante
+          await fetch('/api/bot/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              creatorUserId: info.sharedId || info.userId || creatorId, 
+              livestreamId: info.livestreamId || null 
+            })
+          });
+
           if (info.isLive || info.liveFound || info.livestreamId) {
-            showToast(`Live #${info.livestreamId || creatorId} de ${info.name} detectada! Iniciando moderação...`, 'success');
-            // Inicia automaticamente o monitoramento da live detectada
-            await fetch('/api/bot/start', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ creatorUserId: info.userId, livestreamId: info.livestreamId })
-            });
+            showToast(`🔴 Live #${info.livestreamId || creatorId} de "${info.name}" detectada! Moderação iniciada!`, 'success', 5000);
           } else {
-            showToast(`Perfil de "${info.name}" (ID: ${info.sharedId || info.userId}) localizado com sucesso! A criadora está offline no momento (Modo Vigilante pronto).`, 'info', 4500);
+            showToast(`🛡️ Perfil de "${info.name}" (ID: ${info.sharedId || info.userId}) detectado! Modo Vigilante ATIVADO — o robô monitorará e entrará na live automaticamente!`, 'success', 5000);
           }
         } else {
           showToast(d.error || 'Nenhum perfil ou live encontrado com o identificador informado.', 'danger');
