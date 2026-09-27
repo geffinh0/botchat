@@ -240,17 +240,22 @@ class BotEngine {
           this.logSystem('WS', 'INFO', `Conexão simultânea evitada. Novo Device-ID único gerado: ${this.config.deviceId}`);
         }
 
+        // Se o token for inválido, não entra em loop de reconexão; o REST DualSync assume a captura
+        if (this.authFailed) {
+          return;
+        }
+
         // Não reconecta se a moderação estiver parada
         if (!this.isMonitoring && !this.activeLive) {
           return;
         }
 
-        const waitTime = evt.reason === 'duplicate_connection' ? 5000 : 3000;
+        const waitTime = evt.reason === 'duplicate_connection' ? 8000 : 5000;
         this.logSystem('WS', 'WARN', `Conexão WebSocket finalizada (código: ${evt.code}, motivo: ${evt.reason || 'N/A'}). Reconectando em ${waitTime / 1000}s...`);
 
         if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
         this.reconnectTimer = setTimeout(() => {
-          if (this.isMonitoring || this.activeLive) {
+          if ((this.isMonitoring || this.activeLive) && !this.authFailed) {
             this.connectWebSocket();
           }
         }, waitTime);
@@ -311,8 +316,8 @@ class BotEngine {
 
       if (msg.type === 'invalid_auth') {
         if (!this.authFailed) {
-          this.logSystem('WS', 'INFO', 'WebSocket operando em Modo Device-ID (escuta em tempo real do chat e eventos da live).');
           this.authFailed = true;
+          this.logSystem('WS', 'INFO', 'WebSocket requer token de moderador ativo. Sincronização em tempo real transferida automaticamente para REST DualSync (100% operacional).');
         }
         return;
       }
@@ -906,7 +911,7 @@ class BotEngine {
       } catch (e) {
         // Silencioso
       }
-    }, 3000);
+    }, 15000);
   }
 
   stopWatchdog() {
@@ -1187,6 +1192,7 @@ class BotEngine {
       isMonitoring: this.isMonitoring,
       wsConnected: this.wsConnected,
       authFailed: !!this.authFailed,
+      dualSyncActive: !!this.syncPollTimer,
       activeLive: this.activeLive,
       activeCreator: db.getActiveCreator(),
       config: db.getConfig(),

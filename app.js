@@ -1750,16 +1750,30 @@ function initBotModeratorModule() {
       const data = await res.json();
       botStatus = data;
 
-      // Status do WebSocket
+      // Status da Conexão em Tempo Real (WebSocket & REST DualSync)
       if (botWsBadge) {
         if (data.wsConnected) {
           botWsBadge.textContent = 'ONLINE (WS)';
           botWsBadge.className = 'badge-tag live-badge';
-          botWsBadge.title = data.authFailed ? 'Conectado via WebSocket oficial do SuperLive (Modo Device-ID Contínuo)' : 'Conectado via WebSocket oficial do SuperLive (Autenticado)';
+          botWsBadge.title = 'Conectado via WebSocket oficial do SuperLive';
+        } else if (data.dualSyncActive || (data.isMonitoring && data.activeLive)) {
+          botWsBadge.textContent = 'ONLINE (DUAL-SYNC)';
+          botWsBadge.className = 'badge-tag live-badge';
+          botWsBadge.title = 'Conectado e sincronizando chat em tempo real via REST DualSync oficial';
+        } else if (data.isMonitoring) {
+          botWsBadge.textContent = 'MODO VIGILANTE';
+          botWsBadge.className = 'badge-tag';
+          botWsBadge.style.background = 'rgba(99,102,241,0.2)';
+          botWsBadge.style.color = '#a5b4fc';
+          botWsBadge.style.borderColor = 'rgba(99,102,241,0.5)';
+          botWsBadge.title = 'Robô em Modo Vigilante aguardando o início da live';
         } else {
-          botWsBadge.textContent = 'CONECTANDO';
-          botWsBadge.className = 'badge-tag warning-badge';
-          botWsBadge.title = 'Conectando ao WebSocket do SuperLive...';
+          botWsBadge.textContent = 'STANDBY (PRONTO)';
+          botWsBadge.className = 'badge-tag';
+          botWsBadge.style.background = 'rgba(255,255,255,0.08)';
+          botWsBadge.style.color = 'var(--text-secondary)';
+          botWsBadge.style.borderColor = 'rgba(255,255,255,0.12)';
+          botWsBadge.title = 'Robô pronto para entrar na live. Clique em Iniciar Moderação ou Detectar Live.';
         }
       }
 
@@ -2805,13 +2819,21 @@ async function fetchSystemLogs() {
 
     if (wsStatusEl) {
       if (data.wsConnected) {
-        wsStatusEl.innerHTML = '<span class="live-dot-pulse" style="background:#10b981;"></span> ONLINE';
+        wsStatusEl.innerHTML = '<span class="live-dot-pulse" style="background:#10b981;"></span> ONLINE (WS)';
         wsStatusEl.style.color = 'var(--success)';
-        if (wsDetailEl) wsDetailEl.textContent = data.authFailed ? 'Modo Device-ID (Guest Estável)' : 'Modo Autenticado (Token Oficial)';
+        if (wsDetailEl) wsDetailEl.textContent = 'WebSocket oficial conectado e ativo';
+      } else if (data.dualSyncActive || (data.isMonitoring && data.activeLive)) {
+        wsStatusEl.innerHTML = '<span class="live-dot-pulse" style="background:#10b981;"></span> ONLINE (DUAL-SYNC)';
+        wsStatusEl.style.color = 'var(--success)';
+        if (wsDetailEl) wsDetailEl.textContent = 'REST DualSync oficial ativo (captura e moderação contínua)';
+      } else if (data.isMonitoring) {
+        wsStatusEl.innerHTML = '<span class="live-dot-pulse" style="background:#6366f1;"></span> MODO VIGILANTE';
+        wsStatusEl.style.color = 'var(--accent)';
+        if (wsDetailEl) wsDetailEl.textContent = 'Vigilante ativo aguardando início da transmissão';
       } else {
-        wsStatusEl.innerHTML = '<span class="live-dot-pulse" style="background:#f59e0b;"></span> CONECTANDO';
-        wsStatusEl.style.color = 'var(--warning)';
-        if (wsDetailEl) wsDetailEl.textContent = 'Tentando restabelecer conexão...';
+        wsStatusEl.innerHTML = '<span style="color:var(--text-muted);">●</span> STANDBY (PRONTO)';
+        wsStatusEl.style.color = 'var(--text-secondary)';
+        if (wsDetailEl) wsDetailEl.textContent = 'Robô pronto para entrar na live.';
       }
     }
 
